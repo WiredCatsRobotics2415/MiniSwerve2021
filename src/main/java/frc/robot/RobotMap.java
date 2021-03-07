@@ -27,12 +27,21 @@ public class RobotMap {
     public static final boolean BACK_LEFT_AZIMUTH_ENCODER_REV = true;
     public static final boolean BACK_RIGHT_AZIMUTH_ENCODER_REV = true;
 
-    public static final double FRONT_LEFT_MODULE_X = 2.21, FRONT_LEFT_MODULE_Y = 2.21; // inches
-    public static final double FRONT_RIGHT_MODULE_X = 27.5 - 2.21, FRONT_RIGHT_MODULE_Y = 2.21;
-    public static final double BACK_LEFT_MODULE_X = 2.21, BACK_LEFT_MODULE_Y = 32 - 2.21;
-    public static final double BACK_RIGHT_MODULE_X = 27.5 - 2.21, BACK_RIGHT_MODULE_Y = 32 - 2.21;
+    public static final double FRONT_LEFT_MODULE_X = -1, FRONT_LEFT_MODULE_Y = 1; // inches
+    public static final double FRONT_RIGHT_MODULE_X = 1, FRONT_RIGHT_MODULE_Y = 1; //quick values for sqare robot
+    public static final double BACK_LEFT_MODULE_X = -1, BACK_LEFT_MODULE_Y = -1;
+    public static final double BACK_RIGHT_MODULE_X = 1, BACK_RIGHT_MODULE_Y = -1;
 
-    public static final double CENTER_OF_MASS_X = 27.5 / 2;
-    public static final double CENTER_OF_MASS_Y = 32.0 / 2;
+    public static final double CENTER_OF_MASS_X = 0;
+    public static final double CENTER_OF_MASS_Y = 0;
 
+    //Intake
+    public static final int INTAKE_MOTOR = 0;
+    public static final int INTAKE_LEFT_FORWARD_SOLENNOID = 0;
+    public static final int INTAKE_LEFT_REVERSE_SOLENNOID = 0;
+    public static final int INTAKE_RIGHT_FORWARD_SOLENNOID = 0;
+    public static final int INTAKE_RIGHT_REVERSE_SOLENNOID = 0;
+
+    //PCM
+    public static final int PCM_ID = 20;
 }

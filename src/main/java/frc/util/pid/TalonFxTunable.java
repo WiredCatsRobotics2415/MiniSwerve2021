@@ -64,10 +64,15 @@ public class TalonFxTunable implements PIDTunable{
         return talon.getClosedLoopTarget(0);
     }
 
+    public void enableTuning(String name) {
+        if(tuning) return;
+        this.tuning = true;
+        this.tuner = new PIDTuner(this, name);
+    }
+
     @Override
     public void setSetpoint(double setpoint) {
         talon.set(ControlMode.Position, setpoint);
-        this.run();
     }
 
     public void run() {

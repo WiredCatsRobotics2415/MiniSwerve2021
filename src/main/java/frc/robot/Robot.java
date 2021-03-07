@@ -4,9 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.subsystems.Intake;
+import frc.subsystems.SwerveDrive;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -15,20 +16,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  public static SwerveDrive swerveDrive;
+  public static Intake intake;
+  public static Compressor compressor;
 
+  public static OI oi;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    swerveDrive = new SwerveDrive(true);
+    swerveDrive.drive(0, 0, 0);
+
+    intake = new Intake();
+    intake.retract();
+    intake.stopIntaking();
+
+    compressor = new Compressor(RobotMap.PCM_ID);
+    compressor.setClosedLoopControl(true);
+    compressor.stop();
   }
 
   /**
@@ -53,32 +61,36 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+  }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
+    if(oi.getIntakeExtensionToggle()) {
+      intake.toggleExtension();
+    }
+    if(oi.getIntakeToggle()) {
+      intake.toggleIntaking();
+    }
+    if(oi.getCompressingToggle()) {
+      if(compressor.enabled()) {
+        compressor.stop();
+      } else {
+        compressor.start();
+      }
+    }
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override

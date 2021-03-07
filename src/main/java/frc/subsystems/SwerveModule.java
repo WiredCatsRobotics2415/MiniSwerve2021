@@ -50,7 +50,7 @@ public class SwerveModule {
         this.azimuthMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,
                 Constants.kCanTimeoutMs);
 
-        this.azimuthMotor.configSelectedFeedbackCoefficient(56.0/3.0*360.0/2048, 0, Constants.kCanTimeoutMs);
+        this.azimuthMotor.configSelectedFeedbackCoefficient(360.0/(2048*56.0/3.0), 0, Constants.kCanTimeoutMs);
 
         this.driveMotor.setNeutralMode(NeutralMode.Brake);
         this.azimuthMotor.setNeutralMode(NeutralMode.Brake);

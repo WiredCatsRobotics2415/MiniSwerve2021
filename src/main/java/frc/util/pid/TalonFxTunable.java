@@ -18,8 +18,8 @@ public class TalonFxTunable implements PIDTunable{
 
     public TalonFxTunable(TalonFX talon, PIDValue pidValue) {
         this.talon = talon;
-        this.setPID(pidValue.getKP(), pidValue.getKI(), pidValue.getKD());
         this.pidValue = pidValue;
+        this.setPID(pidValue.getKP(), pidValue.getKI(), pidValue.getKD());
         this.tuner = null;
         this.tuning = false;
     }
@@ -33,9 +33,9 @@ public class TalonFxTunable implements PIDTunable{
     }
 
     public void setPID(double kP, double kI, double kD) {
-        talon.config_kP(0, pidValue.getKP(), Constants.kCanTimeoutMs);
-        talon.config_kI(0, pidValue.getKI(), Constants.kCanTimeoutMs);
-        talon.config_kD(0, pidValue.getKD(), Constants.kCanTimeoutMs);
+        this.talon.config_kP(0, pidValue.getKP(), Constants.kCanTimeoutMs);
+        this.talon.config_kI(0, pidValue.getKI(), Constants.kCanTimeoutMs);
+        this.talon.config_kD(0, pidValue.getKD(), Constants.kCanTimeoutMs);
     }
 
     public void setPIDConstants(double kP, double kI, double kD) {

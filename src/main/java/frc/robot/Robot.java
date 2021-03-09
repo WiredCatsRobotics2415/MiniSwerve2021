@@ -27,8 +27,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    swerveDrive = new SwerveDrive(true);
-    swerveDrive.drive(0, 0, 0);
+    //swerveDrive = new SwerveDrive(true);
+    //swerveDrive.drive(0, 0, 0);
+
+    oi = new OI();
 
     intake = new Intake();
     intake.retract();
@@ -76,7 +78,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
+    //swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
     if(oi.getIntakeExtensionToggle()) {
       intake.toggleExtension();
     }
@@ -84,6 +86,7 @@ public class Robot extends TimedRobot {
       intake.toggleIntaking();
     }
     if(oi.getCompressingToggle()) {
+      System.out.println("Compressor toggle");
       if(compressor.enabled()) {
         compressor.stop();
       } else {

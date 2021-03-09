@@ -22,18 +22,18 @@ public class OI {
     }
 
     public double getRotation() {
-        return this.controller.getRawAxis(4);
+        return this.controller.getRawAxis(2);
     }
 
     public boolean getIntakeToggle() {
-        return this.controller.getRawButtonPressed(0);
+        return this.controller.getRawButtonPressed(6); //right bumper
     }
 
     public boolean getIntakeExtensionToggle() {
-        return this.controller.getRawButtonPressed(0);
+        return this.controller.getRawButtonPressed(5); //left bumper
     }
 
     public boolean getCompressingToggle() {
-        return this.controller.getRawButtonPressed(0);
+        return this.controller.getRawButtonPressed(2); //x button
     }
 }

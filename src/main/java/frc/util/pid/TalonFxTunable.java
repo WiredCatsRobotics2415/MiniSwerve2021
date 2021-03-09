@@ -10,7 +10,11 @@ public class TalonFxTunable implements PIDTunable{
     private TalonFX talon;
     private PIDTuner tuner;
 
+    private double setpoint;
+
     private boolean tuning;
+
+    private boolean testing;
 
     public TalonFxTunable(TalonFX talon, double kP, double kI, double kD) {
         this(talon, new PIDValue(kP, kI, kD));
@@ -20,8 +24,10 @@ public class TalonFxTunable implements PIDTunable{
         this.talon = talon;
         this.pidValue = pidValue;
         this.setPID(pidValue.getKP(), pidValue.getKI(), pidValue.getKD());
+        this.setpoint = 0;
         this.tuner = null;
         this.tuning = false;
+        this.testing = false;
     }
 
     public TalonFxTunable(TalonFX talon, PIDValue pidValue, boolean tuning, String name) {
@@ -32,10 +38,22 @@ public class TalonFxTunable implements PIDTunable{
         }
     }
 
+    public TalonFxTunable(boolean testing, TalonFX talon, PIDValue pidValue) {
+        this.talon = talon;
+        this.pidValue = pidValue;
+        this.tuner = null;
+        this.tuning = false;
+        this.setpoint = 0;
+        this.testing = testing;
+        this.setPID(pidValue.getKP(), pidValue.getKI(), pidValue.getKD());
+    }
+
     public void setPID(double kP, double kI, double kD) {
-        this.talon.config_kP(0, pidValue.getKP(), Constants.kCanTimeoutMs);
-        this.talon.config_kI(0, pidValue.getKI(), Constants.kCanTimeoutMs);
-        this.talon.config_kD(0, pidValue.getKD(), Constants.kCanTimeoutMs);
+        if(!testing) {
+            this.talon.config_kP(0, pidValue.getKP(), Constants.kCanTimeoutMs);
+            this.talon.config_kI(0, pidValue.getKI(), Constants.kCanTimeoutMs);
+            this.talon.config_kD(0, pidValue.getKD(), Constants.kCanTimeoutMs);
+        }
     }
 
     public void setPIDConstants(double kP, double kI, double kD) {
@@ -56,12 +74,13 @@ public class TalonFxTunable implements PIDTunable{
     }
 
     public double getError() {
+        if(testing) return 0;
         return talon.getClosedLoopError(0);
     }
 
     @Override
     public double getSetpoint() {
-        return talon.getClosedLoopTarget(0);
+        return this.setpoint;
     }
 
     public void enableTuning(String name) {
@@ -72,11 +91,14 @@ public class TalonFxTunable implements PIDTunable{
 
     @Override
     public void setSetpoint(double setpoint) {
-        talon.set(ControlMode.Position, setpoint);
+        this.setpoint = setpoint;
+        if(!testing) {
+            talon.set(ControlMode.Position, setpoint);
+        }
     }
 
     public void run() {
-        if(tuning) {
+        if(tuning && !testing) {
             this.tuner.update();
         }
     }

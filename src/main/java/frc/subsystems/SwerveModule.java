@@ -1,35 +1,30 @@
 package frc.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import frc.util.Vector2D;
 import frc.util.PWMAbsoluteEncoder;
-import frc.util.pid.PIDTunable;
-import frc.util.pid.PIDTuner;
 import frc.util.pid.PIDValue;
-import frc.util.pid.SparkPositionControllerPWMEncoder;
 import frc.util.pid.TalonFxTunable;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 
 public class SwerveModule {
-    private static final double AZIMUTH_POSITION_TOLERANCE = 1.5, AZIMUTH_VELOCITY_TOLERANCE = 1000000000000.0;
 
     private final TalonFX driveMotor, azimuthMotor; // motors
 
     private final PWMAbsoluteEncoder azimuthEncoder; // absolute encoder
 
-    private TalonFxTunable azimuthController;
+    private final TalonFxTunable azimuthController;
 
     private final double positionX, positionY, radius;
+
     private double prevAzimuthSetpoint;
     private int turns;
     private boolean azimuthReversed;
@@ -40,7 +35,7 @@ public class SwerveModule {
         this.driveMotor = new TalonFX(driveMotorID);
         this.azimuthMotor = new TalonFX(azimuthMotorID);
 
-        this.azimuthEncoder = new PWMAbsoluteEncoder(azimuthEncoderChannel, azimuthEncoderOffset, azimuthReversed);
+        this.azimuthEncoder = new PWMAbsoluteEncoder(azimuthEncoderChannel, azimuthEncoderOffset, azimuthEncoderReversed);
 
         this.driveMotor.configFactoryDefault(Constants.kCanTimeoutMs);
         this.driveMotor.configFactoryDefault(Constants.kCanTimeoutMs);
@@ -52,8 +47,8 @@ public class SwerveModule {
 
         this.azimuthMotor.configSelectedFeedbackCoefficient(360.0/(2048*56.0/3.0), 0, Constants.kCanTimeoutMs);
 
-        this.driveMotor.setNeutralMode(NeutralMode.Brake);
-        this.azimuthMotor.setNeutralMode(NeutralMode.Brake);
+        this.driveMotor.setNeutralMode(NeutralMode.Coast);
+        this.azimuthMotor.setNeutralMode(NeutralMode.Coast);
         this.driveMotor.setInverted(false);
         this.azimuthMotor.setInverted(false);
 
@@ -62,6 +57,9 @@ public class SwerveModule {
 		this.azimuthMotor.configPeakOutputForward(1, Constants.kCanTimeoutMs);
         this.azimuthMotor.configPeakOutputReverse(-1, Constants.kCanTimeoutMs);
 
+        this.azimuthMotor.configClosedLoopPeakOutput(0, 0.8, Constants.kCanTimeoutMs);
+        this.azimuthMotor.configNeutralDeadband(Constants.MOTORMIN, Constants.kCanTimeoutMs);
+
         this.driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, .1));
         this.azimuthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, .1));
         
@@ -69,9 +67,9 @@ public class SwerveModule {
         this.azimuthMotor.config_kI(0,pidValues.getKI(), Constants.kCanTimeoutMs);
         this.azimuthMotor.config_kD(0,pidValues.getKD(), Constants.kCanTimeoutMs);
         
-        this.azimuthMotor.configAllowableClosedloopError(0, 2.0, Constants.kCanTimeoutMs);
-        
-        this.azimuthMotor.configIntegratedSensorOffset(this.azimuthEncoder.getRotationDegrees(), Constants.kCanTimeoutMs);
+        this.azimuthMotor.configAllowableClosedloopError(0, 4.0, Constants.kCanTimeoutMs);
+
+        this.azimuthMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero, Constants.kCanTimeoutMs);
 
         this.positionX = positionX;
         this.positionY = positionY;
@@ -82,7 +80,8 @@ public class SwerveModule {
 
         this.azimuthController = new TalonFxTunable(this.azimuthMotor, pidValues);
 
-        this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
+        this.zeroEncoder();
+
         this.prevAzimuthSetpoint = this.azimuthEncoder.getRotationDegrees();
         this.turns = 0;
     }
@@ -128,8 +127,19 @@ public class SwerveModule {
         this.prevAzimuthSetpoint = degrees;
     }
 
+    public void zeroEncoder() {
+        this.azimuthMotor.set(ControlMode.PercentOutput, 0.0);;
+        this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
+        this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
+    }
+
+    public void setAngleSimple(double degrees) {
+        azimuthController.setSetpoint(degrees);
+        azimuthController.run();
+    }
+
     public void setPercentSpeed(double percent) {
-        this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
+        //this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
     public double getRadius() {
@@ -142,5 +152,13 @@ public class SwerveModule {
 
     public double getPositionY() {
         return positionY;
+    }
+
+    public void printAzimuthTalonEncoderValue() {
+        System.out.println("TalonFx x:"+this.getPositionX()+" y:"+this.getPositionY()+" Value:"+this.azimuthMotor.getSelectedSensorPosition(0) + " : "+this.azimuthMotor.getSelectedSensorPosition(0)%360);
+    }
+
+    public void printAzimuthEncoderValue() {
+        System.out.println("MA3 x:"+this.getPositionX()+" y:"+this.getPositionY()+" Value:"+this.azimuthEncoder.getRotationDegrees());
     }
 }

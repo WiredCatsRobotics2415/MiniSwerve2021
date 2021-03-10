@@ -7,8 +7,9 @@ import frc.robot.Constants;
 
 public class TalonFxTunable implements PIDTunable{
     private final PIDValue pidValue;
-    private TalonFX talon;
+    private final TalonFX talon;
     private PIDTuner tuner;
+
 
     private boolean tuning;
 

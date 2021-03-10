@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    //swerveDrive = new SwerveDrive(true);
+    swerveDrive = new SwerveDrive();
     //swerveDrive.drive(0, 0, 0);
 
     oi = new OI();
@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
     compressor = new Compressor(RobotMap.PCM_ID);
     compressor.setClosedLoopControl(true);
     compressor.stop();
+
   }
 
   /**
@@ -73,12 +74,13 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    swerveDrive.zeroYaw();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
+    swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
     if(oi.getIntakeExtensionToggle()) {
       intake.toggleExtension();
     }
@@ -92,6 +94,22 @@ public class Robot extends TimedRobot {
       } else {
         compressor.start();
       }
+    }
+    if(oi.getRawButtonPressed(14)) {
+      System.out.println("Encoders Zeroed");
+      swerveDrive.zeroEncoders();
+    }
+    if(oi.getRawButtonPressed(1)) {
+      swerveDrive.printModuleEncoders((short)0);
+    }
+    if(oi.getRawButtonPressed(2)) {
+      swerveDrive.printModuleEncoders((short)1);
+    }
+    if(oi.getRawButtonPressed(3)) {
+      swerveDrive.printModuleEncoders((short)2);
+    }
+    if(oi.getRawButtonPressed(4)) {
+      swerveDrive.printModuleEncoders((short)3);
     }
   }
 

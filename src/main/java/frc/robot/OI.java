@@ -14,15 +14,21 @@ public class OI {
     }
 
     public double getX() {
-        return this.controller.getRawAxis(0);
+        double val = this.controller.getRawAxis(0);
+        if(Math.abs(val) < Constants.DEADBAND) return 0;
+        return val;
     }
 
     public double getY() {
-        return this.controller.getRawAxis(1)*-1;
+        double val = this.controller.getRawAxis(1)*-1;
+        if(Math.abs(val) < Constants.DEADBAND) return 0;
+        return val;
     }
 
     public double getRotation() {
-        return this.controller.getRawAxis(2);
+        double val = this.controller.getRawAxis(2);
+        if(Math.abs(val) < Constants.DEADBAND) return 0;
+        return val;
     }
 
     public boolean getIntakeToggle() {
@@ -35,5 +41,9 @@ public class OI {
 
     public boolean getCompressingToggle() {
         return this.controller.getRawButtonPressed(2); //x button
+    }
+
+    public boolean getRawButtonPressed(int button) {
+        return this.controller.getRawButtonPressed(button);
     }
 }

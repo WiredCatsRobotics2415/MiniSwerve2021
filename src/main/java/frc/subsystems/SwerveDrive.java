@@ -14,7 +14,7 @@ public class SwerveDrive {
 
     private final AHRS navX;
 
-    private final double minModuleRadius;
+    private final double maxModuleRadius;
 
     private double prevAngle;
     private long prevTime;
@@ -44,8 +44,8 @@ public class SwerveDrive {
                 Constants.BACK_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_RIGHT_AZIMUTH_ENCODER_REV, tuning, "BRM");
 
         this.navX = new AHRS(Port.kMXP);
-        this.minModuleRadius = Math.min(Math.min(this.frontLeftModule.getRadius(), this.frontRightModule.getRadius()),
-                Math.min(this.backLeftModule.getRadius(), this.backRightModule.getRadius()));
+        this.maxModuleRadius = Math.max(Math.max(this.frontLeftModule.getRadius(), this.frontRightModule.getRadius()),
+                Math.max(this.backLeftModule.getRadius(), this.backRightModule.getRadius()));
     }
 
     public void zeroYaw() {
@@ -56,7 +56,7 @@ public class SwerveDrive {
         Vector2D strafeVector = Vector2D.vectorFromRectForm(x, y);
         double yaw = navX.getYaw();
         strafeVector = strafeVector.rotate(yaw, true);
-        if (r == 0 && strafeVector.getLength() != 0) {
+        /*if (r == 0 && strafeVector.getLength() != 0) {
             r = (prevAngle - yaw) * TURNING_KP
                     + ((prevAngle - yaw) / (System.currentTimeMillis() - prevTime)) * TURNING_KD;
             if (Math.abs(r) > MAX_ADJUSTMENT) {
@@ -64,7 +64,7 @@ public class SwerveDrive {
             }
         } else {
             prevAngle = yaw;
-        }
+        }*/
         Vector2D fLVector = Vector2D.addVectors(strafeVector, getTurnAngleVector(r, frontLeftModule));
         Vector2D fRVector = Vector2D.addVectors(strafeVector, getTurnAngleVector(r, frontRightModule));
         Vector2D bLVector = Vector2D.addVectors(strafeVector, getTurnAngleVector(r, backLeftModule));
@@ -82,10 +82,54 @@ public class SwerveDrive {
         backRightModule.setVector(bRVector);
     }
 
+    public void printEncoderValues() {
+        frontLeftModule.printAzimuthEncoderValue();
+        frontRightModule.printAzimuthEncoderValue();
+        backLeftModule.printAzimuthEncoderValue();
+        backRightModule.printAzimuthEncoderValue();
+    }
+
+    public void printModuleEncoders(short moduleNum) {
+        SwerveModule module;
+        switch(moduleNum) {
+            case 0:
+                module = this.frontRightModule;
+                break;
+            case 1:
+                module = this.frontLeftModule;
+                break;
+            case 2:
+                module = this.backLeftModule;
+                break;
+            case 3:
+                module = this.backRightModule;
+                break;
+            default:
+                module = this.frontRightModule;
+                break;
+        }
+        module.printAzimuthEncoderValue();
+        module.printAzimuthTalonEncoderValue();
+    }
+
+    public void setAngle(double degrees) {
+        frontLeftModule.setAngleSimple(degrees);
+        frontRightModule.setAngleSimple(degrees);
+        backLeftModule.setAngleSimple(degrees);
+        backRightModule.setAngleSimple(degrees);
+    }
+
+    public void zeroEncoders() {
+        frontLeftModule.zeroEncoder();
+        frontRightModule.zeroEncoder();
+        backLeftModule.zeroEncoder();
+        backRightModule.zeroEncoder();
+    }
+
     private Vector2D getTurnAngleVector(double r, SwerveModule module) {
         double angle;
-        angle = Math.atan2(RobotMap.CENTER_OF_MASS_Y - module.getPositionY(),
-                module.getPositionX() - RobotMap.CENTER_OF_MASS_X) - (Math.PI / 2);
-        return new Vector2D(r * minModuleRadius / module.getRadius(), angle);
+        angle = Math.atan2(module.getPositionY()-RobotMap.CENTER_OF_MASS_Y,
+                module.getPositionX() - RobotMap.CENTER_OF_MASS_X)-Math.PI/2;
+        return new Vector2D(r * module.getRadius() / maxModuleRadius, angle); //changed from min radius so I need to check
     }
 }

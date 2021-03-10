@@ -54,7 +54,7 @@ public class PWMAbsoluteEncoder {
             returnValue = 0;
             System.out.println("Error reading encoder value, value = " + x + "   " + offset);
         }
-        if (reversed) {
+        if (this.reversed) {
             returnValue *= -1;
         }
         returnValue = (returnValue - offset) % COUNTS_PER_ROTATION;

@@ -54,7 +54,7 @@ public class Intake {
     }
 
     public void intake() {
-        this.intakeMotor.set(.3);
+        this.intakeMotor.set(.8);
         this.intaking = true;
     }
 
@@ -69,5 +69,9 @@ public class Intake {
         } else {
             this.intake();
         }
+    }
+
+    public void printCurrent() {
+        System.out.println(this.intakeMotor.getOutputCurrent());
     }
 }

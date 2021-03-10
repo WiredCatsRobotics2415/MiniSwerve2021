@@ -17,10 +17,10 @@ public class RobotMap {
     public static final int BACK_LEFT_SWERVE_DRIVE = 33;
     public static final int BACK_RIGHT_SWERVE_DRIVE = 34;
 
-    public static final int FRONT_LEFT_AZIMUTH_ENCODER = 3;
-    public static final int FRONT_RIGHT_AZIMUTH_ENCODER = 2;
+    public static final int FRONT_LEFT_AZIMUTH_ENCODER = 0;
+    public static final int FRONT_RIGHT_AZIMUTH_ENCODER = 3;
     public static final int BACK_LEFT_AZIMUTH_ENCODER = 1;
-    public static final int BACK_RIGHT_AZIMUTH_ENCODER = 0;
+    public static final int BACK_RIGHT_AZIMUTH_ENCODER = 2;
 
     public static final boolean FRONT_LEFT_AZIMUTH_ENCODER_REV = true;
     public static final boolean FRONT_RIGHT_AZIMUTH_ENCODER_REV = true;

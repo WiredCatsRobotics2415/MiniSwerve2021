@@ -11,7 +11,7 @@ public class Constants {
     public static final PIDValue BACK_RIGHT_AZIMUTH_PID = new PIDValue(30, 0.0, 55);
 
     public static final double FRONT_LEFT_AZIMUTH_ENCODER_OFFSET = 304-180; // offset by 90
-    public static final double FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET = 0;
+    public static final double FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET = 5.976+180;
     public static final double MOTORMIN = 0.05;
     public static final double BACK_LEFT_AZIMUTH_ENCODER_OFFSET = 219.7;
     public static final double BACK_RIGHT_AZIMUTH_ENCODER_OFFSET = 211.6;

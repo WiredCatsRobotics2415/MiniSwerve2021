@@ -1,5 +1,6 @@
 package frc.subsystems;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -110,8 +111,9 @@ public class SwerveModule {
     }
 
     public void setAngle(double degrees) { // must be called every 20ms
-        double currentDirection = azimuthEncoder.getRotationDegrees();
-        if (Math.abs(degrees - currentDirection) > 90 && Math.abs(degrees - currentDirection) < 270) {
+        //double encoderValue = azimuthMotor.getSelectedSensorPosition(0);
+        //double currentDirection = Vector2D.modulus(encoderValue,360);//azimuthEncoder.getRotationDegrees();
+        if (Math.abs(degrees - this.prevAzimuthSetpoint) > 90 && Math.abs(degrees - this.prevAzimuthSetpoint) < 270) {
             degrees = (degrees + 180) % 360;
             azimuthReversed = true;
         } else {
@@ -122,14 +124,17 @@ public class SwerveModule {
         } else if(degrees < this.prevAzimuthSetpoint && Math.abs(degrees - this.prevAzimuthSetpoint) > 180) {
             turns++;
         }
-        azimuthController.setSetpoint(degrees+(turns*360.0));
+        azimuthController.setSetpoint(degrees+turns*360.0);
         azimuthController.run();
         this.prevAzimuthSetpoint = degrees;
     }
 
     public void zeroEncoder() {
-        this.azimuthMotor.set(ControlMode.PercentOutput, 0.0);;
-        this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
+        this.azimuthMotor.set(ControlMode.PercentOutput, 0.0);
+        ErrorCode error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
+        if(!error.equals(ErrorCode.OK)) {
+            error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
+        }
         this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
     }
 
@@ -139,7 +144,7 @@ public class SwerveModule {
     }
 
     public void setPercentSpeed(double percent) {
-        //this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
+        this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
     public double getDrivePosition() {

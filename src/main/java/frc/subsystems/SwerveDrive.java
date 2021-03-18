@@ -15,17 +15,17 @@ public class SwerveDrive {
     private final AHRS navX;
 
     private final double maxModuleRadius;
-
-    private double prevAngle;
-    private long prevTime;
+    //private double prevAngle;
+    //private long prevTime;
+    
 
     public static final double TURNING_KP = 0.015, TURNING_KD = 0.0, MAX_ADJUSTMENT = 0.3;
 
     public SwerveDrive() {
-        this(false);
+        this(false, false);
     }
 
-    public SwerveDrive(boolean tuning) {
+    public SwerveDrive(boolean tuning, boolean logging) {
         this.frontLeftModule = new SwerveModule(RobotMap.FRONT_LEFT_SWERVE_DRIVE, RobotMap.FRONT_LEFT_SWERVE_AZIMUTH,
                 RobotMap.FRONT_LEFT_SWERVE_AZIMUTH_REV, RobotMap.FRONT_LEFT_AZIMUTH_ENCODER,
                 RobotMap.FRONT_LEFT_MODULE_X, RobotMap.FRONT_LEFT_MODULE_Y, Constants.FRONT_LEFT_AZIMUTH_PID,
@@ -90,24 +90,7 @@ public class SwerveDrive {
     }
 
     public void printModuleEncoders(short moduleNum) {
-        SwerveModule module;
-        switch(moduleNum) {
-            case 0:
-                module = this.frontRightModule;
-                break;
-            case 1:
-                module = this.frontLeftModule;
-                break;
-            case 2:
-                module = this.backLeftModule;
-                break;
-            case 3:
-                module = this.backRightModule;
-                break;
-            default:
-                module = this.frontRightModule;
-                break;
-        }
+        SwerveModule module = this.getModule(moduleNum);
         module.printAzimuthEncoderValue();
         module.printAzimuthTalonEncoderValue();
     }
@@ -131,5 +114,27 @@ public class SwerveDrive {
         angle = Math.atan2(module.getPositionY()-RobotMap.CENTER_OF_MASS_Y,
                 module.getPositionX() - RobotMap.CENTER_OF_MASS_X)-Math.PI/2;
         return new Vector2D(r * module.getRadius() / maxModuleRadius, angle); //changed from min radius so I need to check
+    }
+
+    private SwerveModule getModule(int moduleNum) {
+        SwerveModule module;
+        switch(moduleNum) {
+            case 0:
+                module = this.frontRightModule;
+                break;
+            case 1:
+                module = this.frontLeftModule;
+                break;
+            case 2:
+                module = this.backLeftModule;
+                break;
+            case 3:
+                module = this.backRightModule;
+                break;
+            default:
+                module = this.frontRightModule;
+                break;
+        }
+        return module;
     }
 }

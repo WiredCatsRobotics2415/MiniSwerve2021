@@ -1,5 +1,6 @@
-package frc.util;
+package frc.util.logging;
 
+import java.util.Arrays;
 import java.util.List;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,14 +10,18 @@ import java.io.IOException;
 public class CSVSaver {
     public static void saveFile(String filename, List<double[]> data) {
         File file = new File(filename);
+        saveFile(file, data);
+    }
+
+    public static void saveFile(File file, List<double[]> data) {
         FileWriter fr = null;
         BufferedWriter br = null;
         String line;
         try {
-            line = "";
             fr = new FileWriter(file);
             br = new BufferedWriter(fr);
             for (double[] datum : data) {
+                line = "";
                 for (int j = 0; j < datum.length; j++) {
                     line += datum[j];
                     if (j < datum.length - 1) {

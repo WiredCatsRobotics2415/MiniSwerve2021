@@ -1,4 +1,4 @@
-package frc.util;
+package frc.util.logging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +15,17 @@ public class MotorLogger implements Runnable {
     }
 
     public void run() {
-        double[] entry = new double[2];
+        double[] deviceData = device.getLogOutput();
+        double[] entry = new double[deviceData.length+1];
         entry[0] = (System.currentTimeMillis() - initialTime) / 1000.0;
-        entry[1] = device.getLogOutput();
         data.add(entry);
     }
 
     public List<double[]> getData() {
         return this.data;
+    }
+
+    public void saveDataToCSV(String filename) {
+        CSVSaver.saveFile(filename, this.data);
     }
 }

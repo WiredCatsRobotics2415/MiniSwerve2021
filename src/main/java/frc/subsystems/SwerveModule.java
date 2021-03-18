@@ -142,6 +142,22 @@ public class SwerveModule {
         //this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
+    public double getDrivePosition() {
+        return this.driveMotor.getSelectedSensorPosition(0);
+    }
+
+    public double getDriveVoltage() {
+        return this.driveMotor.getMotorOutputVoltage();
+    }
+
+    public double getAzimuthAngle() {
+        return this.azimuthEncoder.getRotationDegrees();
+    }
+
+    public double getAzimuthVoltage() {
+        return this.azimuthMotor.getMotorOutputVoltage();
+    }
+
     public double getRadius() {
         return this.radius;
     }

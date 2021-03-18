@@ -81,7 +81,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
-    if(oi.getIntakeExtensionToggle()) {
+    /*if(oi.getIntakeExtensionToggle()) {
       intake.toggleExtension();
     }
     if(oi.getIntakeToggle()) {
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
       } else {
         compressor.start();
       }
-    }
+    }*/
     if(oi.getRawButtonPressed(14)) {
       System.out.println("Encoders Zeroed");
       swerveDrive.zeroEncoders();

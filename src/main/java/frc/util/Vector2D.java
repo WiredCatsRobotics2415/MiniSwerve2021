@@ -5,7 +5,7 @@ public class Vector2D {
 
     public Vector2D(double length, double radians) {
         this.length = length;
-        this.radians = reduceRadians(radians);
+        this.radians = modulus(radians, Math.PI * 2);
     }
 
     public Vector2D(double length, double angle, boolean degrees) {
@@ -61,12 +61,12 @@ public class Vector2D {
         return vectorFromRectForm(v1.getX() + v2.getX(), v1.getY() + v2.getY());
     }
 
-    public static double reduceRadians(double radians) {
-        radians %= Math.PI * 2;
-        if (radians < 0) {
-            radians += Math.PI * 2;
+    public static double modulus(double amount, double divisor) {
+        amount %= divisor;
+        if (amount < 0) {
+            amount += divisor;
         }
-        return radians;
+        return amount;
     }
 
     @Override

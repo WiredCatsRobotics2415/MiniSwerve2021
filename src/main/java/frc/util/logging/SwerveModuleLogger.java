@@ -4,7 +4,7 @@ import frc.subsystems.SwerveModule;
 
 public class SwerveModuleLogger implements Loggable {
     public enum SwerveModuleLoggerMode {
-        DRIVE, AZIMUTH, BOTH;
+        DRIVE, DRIVE_WCURRENT, AZIMUTH, BOTH;
     };
 
     private SwerveModule module;
@@ -22,12 +22,17 @@ public class SwerveModuleLogger implements Loggable {
 
     @Override
     public double[] getLogOutput() {
-        if(this.mode.equals(SwerveModuleLoggerMode.DRIVE)) {
-            return this.getDriveOutput();
-        } else if(this.mode.equals(SwerveModuleLoggerMode.AZIMUTH)) {
-            return this.getAzimuthOutput();
-        } else {
-            return this.getBothOutput();
+        switch(this.mode) {
+            case DRIVE:
+                return this.getDriveOutput();
+            case DRIVE_WCURRENT:
+                return this.getDriveWCurrentOutput();
+            case AZIMUTH:
+                return this.getAzimuthOutput();
+            case BOTH:
+                return this.getBothOutput();
+            default:
+                return this.getBothOutput();
         }
     }
 
@@ -35,6 +40,14 @@ public class SwerveModuleLogger implements Loggable {
         double[] arr = new double[2];
         arr[0] = module.getDrivePosition();
         arr[1] = module.getDriveVoltage();
+        return arr;
+    }
+
+    private double[] getDriveWCurrentOutput() {
+        double[] arr = new double[3];
+        arr[0] = module.getDrivePosition();
+        arr[1] = module.getDriveVoltage();
+        arr[2] = module.getDriveCurrent();
         return arr;
     }
 

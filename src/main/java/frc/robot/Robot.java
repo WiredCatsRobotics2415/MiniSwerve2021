@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    swerveDrive = new SwerveDrive();
+    swerveDrive = new SwerveDrive(Constants.SWERVE_TUNING, Constants.SWERVE_LOGGING);
     //swerveDrive.drive(0, 0, 0);
 
     oi = new OI();
@@ -39,7 +39,6 @@ public class Robot extends TimedRobot {
     compressor = new Compressor(RobotMap.PCM_ID);
     compressor.setClosedLoopControl(true);
     compressor.stop();
-
   }
 
   /**
@@ -96,10 +95,11 @@ public class Robot extends TimedRobot {
       }
     }*/
     if(oi.getRawButtonPressed(14)) {
-      System.out.println("Encoders Zeroed");
+      System.out.println("zero Encoders");
       swerveDrive.zeroEncoders();
     }
     if(oi.getRawButtonPressed(1)) {
+
       swerveDrive.printModuleEncoders((short)0);
     }
     if(oi.getRawButtonPressed(2)) {

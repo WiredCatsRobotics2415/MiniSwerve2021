@@ -1,19 +1,35 @@
 package frc.util.logging;
 
-import java.util.Arrays;
 import java.util.List;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class CSVSaver {
     public static void saveFile(String filename, List<double[]> data) {
-        File file = new File(filename);
+        File file = null;
+        String path = "/home/lvuser/logging";
+        file = new File("/home/lvuser/logging");
+        System.out.println("test");
+        if (!file.exists()) {
+            if (file.mkdir()) {
+                System.out.println("Log Directory is created!");
+            } else {
+                System.out.println("Failed to create Log directory!");
+            }
+        }
+        path += "/"+filename;
+        file = new File(path);
         saveFile(file, data);
     }
 
     public static void saveFile(File file, List<double[]> data) {
+        if(file.exists()) {
+            System.out.println("deleted files");
+            file.delete();
+        }
         FileWriter fr = null;
         BufferedWriter br = null;
         String line;

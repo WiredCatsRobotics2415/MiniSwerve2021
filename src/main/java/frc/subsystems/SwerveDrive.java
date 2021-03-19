@@ -29,19 +29,19 @@ public class SwerveDrive {
         this.frontLeftModule = new SwerveModule(RobotMap.FRONT_LEFT_SWERVE_DRIVE, RobotMap.FRONT_LEFT_SWERVE_AZIMUTH,
                 RobotMap.FRONT_LEFT_SWERVE_AZIMUTH_REV, RobotMap.FRONT_LEFT_AZIMUTH_ENCODER,
                 RobotMap.FRONT_LEFT_MODULE_X, RobotMap.FRONT_LEFT_MODULE_Y, Constants.FRONT_LEFT_AZIMUTH_PID,
-                Constants.FRONT_LEFT_AZIMUTH_ENCODER_OFFSET, RobotMap.FRONT_LEFT_AZIMUTH_ENCODER_REV, tuning, "FLM");
+                Constants.FRONT_LEFT_AZIMUTH_ENCODER_OFFSET, RobotMap.FRONT_LEFT_AZIMUTH_ENCODER_REV, tuning, logging, Constants.FRONT_LEFT_MODULE_NAME);
         this.frontRightModule = new SwerveModule(RobotMap.FRONT_RIGHT_SWERVE_DRIVE, RobotMap.FRONT_RIGHT_SWERVE_AZIMUTH,
                 RobotMap.FRONT_RIGHT_SWERVE_AZIMUTH_REV, RobotMap.FRONT_RIGHT_AZIMUTH_ENCODER,
                 RobotMap.FRONT_RIGHT_MODULE_X, RobotMap.FRONT_RIGHT_MODULE_Y, Constants.FRONT_RIGHT_AZIMUTH_PID,
-                Constants.FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.FRONT_RIGHT_AZIMUTH_ENCODER_REV, tuning, "FRM");
+                Constants.FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.FRONT_RIGHT_AZIMUTH_ENCODER_REV, tuning, logging, Constants.FRONT_RIGHT_MODULE_NAME);
         this.backLeftModule = new SwerveModule(RobotMap.BACK_LEFT_SWERVE_DRIVE, RobotMap.BACK_LEFT_SWERVE_AZIMUTH,
                 RobotMap.BACK_LEFT_SWERVE_AZIMUTH_REV, RobotMap.BACK_LEFT_AZIMUTH_ENCODER, RobotMap.BACK_LEFT_MODULE_X,
                 RobotMap.BACK_LEFT_MODULE_Y, Constants.BACK_LEFT_AZIMUTH_PID,
-                Constants.BACK_LEFT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_LEFT_AZIMUTH_ENCODER_REV, tuning, "BLM");
+                Constants.BACK_LEFT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_LEFT_AZIMUTH_ENCODER_REV, tuning, logging, Constants.BACK_LEFT_MODULE_NAME);
         this.backRightModule = new SwerveModule(RobotMap.BACK_RIGHT_SWERVE_DRIVE, RobotMap.BACK_RIGHT_SWERVE_AZIMUTH,
                 RobotMap.BACK_RIGHT_SWERVE_AZIMUTH_REV, RobotMap.BACK_RIGHT_AZIMUTH_ENCODER,
                 RobotMap.BACK_RIGHT_MODULE_X, RobotMap.BACK_RIGHT_MODULE_Y, Constants.BACK_RIGHT_AZIMUTH_PID,
-                Constants.BACK_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_RIGHT_AZIMUTH_ENCODER_REV, tuning, "BRM");
+                Constants.BACK_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_RIGHT_AZIMUTH_ENCODER_REV, tuning, logging, Constants.BACK_RIGHT_MODULE_NAME);
 
         this.navX = new AHRS(Port.kMXP);
         this.maxModuleRadius = Math.max(Math.max(this.frontLeftModule.getRadius(), this.frontRightModule.getRadius()),
@@ -136,5 +136,12 @@ public class SwerveDrive {
                 break;
         }
         return module;
+    }
+
+    public void saveLog() {
+        frontLeftModule.saveLog();
+        frontRightModule.saveLog();
+        backLeftModule.saveLog();
+        backRightModule.saveLog();
     }
 }

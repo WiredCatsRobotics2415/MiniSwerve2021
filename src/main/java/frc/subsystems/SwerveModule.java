@@ -10,6 +10,9 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import frc.util.Vector2D;
+import frc.util.logging.MotorLogger;
+import frc.util.logging.SwerveModuleLogger;
+import frc.util.logging.SwerveModuleLogger.SwerveModuleLoggerMode;
 import frc.util.PWMAbsoluteEncoder;
 import frc.util.pid.PIDValue;
 import frc.util.pid.TalonFxTunable;
@@ -24,11 +27,14 @@ public class SwerveModule {
 
     private final TalonFxTunable azimuthController;
 
+    private MotorLogger logger;
+
     private final double positionX, positionY, radius;
 
     private double prevAzimuthSetpoint;
     private int turns;
     private boolean azimuthReversed;
+    private String name;
 
     public SwerveModule(int driveMotorID, int azimuthMotorID, boolean azimuthRev, int azimuthEncoderChannel,
             double positionX, double positionY, PIDValue pidValues, double azimuthEncoderOffset,
@@ -43,13 +49,14 @@ public class SwerveModule {
         // Missing current limit
         this.driveMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,
                 Constants.kCanTimeoutMs);
+        this.driveMotor.setSelectedSensorPosition(0, 0, Constants.kCanTimeoutMs);
         this.azimuthMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,
                 Constants.kCanTimeoutMs);
 
         this.azimuthMotor.configSelectedFeedbackCoefficient(360.0/(2048*56.0/3.0), 0, Constants.kCanTimeoutMs);
 
-        this.driveMotor.setNeutralMode(NeutralMode.Coast);
-        this.azimuthMotor.setNeutralMode(NeutralMode.Coast);
+        this.driveMotor.setNeutralMode(NeutralMode.Brake);
+        this.azimuthMotor.setNeutralMode(NeutralMode.Brake);
         this.driveMotor.setInverted(false);
         this.azimuthMotor.setInverted(false);
 
@@ -85,16 +92,23 @@ public class SwerveModule {
 
         this.prevAzimuthSetpoint = this.azimuthEncoder.getRotationDegrees();
         this.turns = 0;
+
+        this.logger = null;
+        this.name = "";
     }
 
     public SwerveModule(int driveMotorID, int azimuthMotorID, boolean azimuthRev, int azimuthEncoderChannel,
             double positionX, double positionY, PIDValue pidValues, double azimuthEncoderOffset,
-            boolean azimuthEncoderReversed, boolean azimuthTuning, String name) {
+            boolean azimuthEncoderReversed, boolean azimuthTuning, boolean logging, String name) {
         this(driveMotorID, azimuthMotorID, azimuthRev, azimuthEncoderChannel, positionX, positionY, pidValues,
                 azimuthEncoderOffset, azimuthEncoderReversed);
         if(azimuthTuning) {
             this.azimuthController.enableTuning(name);
         }
+        if(logging) {
+            this.logger = new MotorLogger(new SwerveModuleLogger(this, Constants.SWERVE_LOGGING_MODE));
+        }
+        this.name = name;
     }
 
     public void setVector(Vector2D vector) {
@@ -107,6 +121,9 @@ public class SwerveModule {
             setPercentSpeed(vector.getLength() * -1);
         } else {
             setPercentSpeed(vector.getLength());
+        }
+        if(this.logger != null) {
+            this.logger.run();
         }
     }
 
@@ -124,8 +141,8 @@ public class SwerveModule {
         } else if(degrees < this.prevAzimuthSetpoint && Math.abs(degrees - this.prevAzimuthSetpoint) > 180) {
             turns++;
         }
-        azimuthController.setSetpoint(degrees+turns*360.0);
-        azimuthController.run();
+        this.azimuthController.setSetpoint(degrees+turns*360.0);
+        this.azimuthController.run();
         this.prevAzimuthSetpoint = degrees;
     }
 
@@ -133,6 +150,7 @@ public class SwerveModule {
         this.azimuthMotor.set(ControlMode.PercentOutput, 0.0);
         ErrorCode error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
         if(!error.equals(ErrorCode.OK)) {
+            System.out.println("failed zero");
             error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
         }
         this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
@@ -141,6 +159,12 @@ public class SwerveModule {
     public void setAngleSimple(double degrees) {
         azimuthController.setSetpoint(degrees);
         azimuthController.run();
+    }
+
+    public void saveLog() {
+        if(this.logger != null) {
+            this.logger.saveDataToCSV(this.name+"logging.csv");
+        }
     }
 
     public void setPercentSpeed(double percent) {
@@ -155,12 +179,20 @@ public class SwerveModule {
         return this.driveMotor.getMotorOutputVoltage();
     }
 
+    public double getDriveCurrent() {
+        return this.driveMotor.getStatorCurrent();
+    }
+
     public double getAzimuthAngle() {
         return this.azimuthEncoder.getRotationDegrees();
     }
 
     public double getAzimuthVoltage() {
         return this.azimuthMotor.getMotorOutputVoltage();
+    }
+
+    public double getAzimuthCurrent() {
+        return this.azimuthMotor.getStatorCurrent();
     }
 
     public double getRadius() {

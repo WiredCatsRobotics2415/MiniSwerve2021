@@ -32,15 +32,23 @@ public class OI {
     }
 
     public boolean getIntakeToggle() {
-        return this.controller.getRawButtonPressed(6); //right bumper
+        return this.controller.getRawButtonPressed(3); //right bumper
     }
 
     public boolean getIntakeExtensionToggle() {
-        return this.controller.getRawButtonPressed(5); //left bumper
+        return this.controller.getRawButtonPressed(4); //left bumper
     }
 
     public boolean getCompressingToggle() {
         return this.controller.getRawButtonPressed(2); //x button
+    }
+
+    public boolean getRightTurningToggle() {
+        return this.controller.getRawButtonPressed(6); //back right
+    }
+
+    public boolean getLeftTurningToggle() {
+        return this.controller.getRawButtonPressed(5); //back right
     }
 
     public boolean getRawButtonPressed(int button) {

@@ -39,8 +39,8 @@ public class RobotMap {
     public static final int INTAKE_MOTOR = 24;
     public static final int INTAKE_LEFT_FORWARD_SOLENNOID = 2;
     public static final int INTAKE_LEFT_REVERSE_SOLENNOID = 3;
-    public static final int INTAKE_RIGHT_FORWARD_SOLENNOID = 4;
-    public static final int INTAKE_RIGHT_REVERSE_SOLENNOID = 5;
+    public static final int INTAKE_RIGHT_FORWARD_SOLENNOID = 5;
+    public static final int INTAKE_RIGHT_REVERSE_SOLENNOID = 4;
 
     //PCM
     public static final int PCM_ID = 10;

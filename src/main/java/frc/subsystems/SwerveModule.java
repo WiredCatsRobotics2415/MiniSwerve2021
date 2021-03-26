@@ -55,8 +55,8 @@ public class SwerveModule {
 
         this.azimuthMotor.configSelectedFeedbackCoefficient(360.0/(2048*56.0/3.0), 0, Constants.kCanTimeoutMs);
 
-        this.driveMotor.setNeutralMode(NeutralMode.Brake);
-        this.azimuthMotor.setNeutralMode(NeutralMode.Brake);
+        this.driveMotor.setNeutralMode(Constants.DRIVE_BREAK_MODE);
+        this.azimuthMotor.setNeutralMode(Constants.DRIVE_BREAK_MODE);
         this.driveMotor.setInverted(false);
         this.azimuthMotor.setInverted(false);
 
@@ -122,9 +122,6 @@ public class SwerveModule {
         } else {
             setPercentSpeed(vector.getLength());
         }
-        if(this.logger != null) {
-            this.logger.run();
-        }
     }
 
     public void setAngle(double degrees) { // must be called every 20ms
@@ -154,6 +151,10 @@ public class SwerveModule {
             error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
         }
         this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
+    }
+
+    public void zeroDriveEncoder() {
+        this.driveMotor.setSelectedSensorPosition(0.0, 0, Constants.kCanTimeoutMs);
     }
 
     public void setAngleSimple(double degrees) {
@@ -205,6 +206,11 @@ public class SwerveModule {
 
     public double getPositionY() {
         return positionY;
+    }
+
+    public void log() {
+        if(this.logger == null) return;
+        this.logger.run();
     }
 
     public void printAzimuthTalonEncoderValue() {

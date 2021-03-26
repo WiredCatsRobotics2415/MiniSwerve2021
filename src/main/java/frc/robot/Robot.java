@@ -4,10 +4,14 @@
 
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.subsystems.Intake;
 import frc.subsystems.SwerveDrive;
+import frc.util.logging.MotorLogger;
+import frc.util.logging.NavXLogger;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,8 +23,15 @@ public class Robot extends TimedRobot {
   public static SwerveDrive swerveDrive;
   public static Intake intake;
   public static Compressor compressor;
+  public static AHRS navX;
 
   public static OI oi;
+
+  private long time = 0;
+  private boolean logged = false;
+  private MotorLogger navXLogger;
+  private double speed = 0.0;
+  private boolean driving = false;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -28,6 +39,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     swerveDrive = new SwerveDrive(Constants.SWERVE_TUNING, Constants.SWERVE_LOGGING);
+    navX = swerveDrive.getNavX();
+    this.navXLogger = new MotorLogger(new NavXLogger(navX));
     //swerveDrive.drive(0, 0, 0);
 
     oi = new OI();
@@ -79,8 +92,14 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    if(oi.getRightTurningToggle()) {
+      swerveDrive.toogleRightTurning();
+    } else if(oi.getLeftTurningToggle()) {
+      swerveDrive.toogleLeftTurning();
+    }
     swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
-    /*if(oi.getIntakeExtensionToggle()) {
+    if(oi.getIntakeExtensionToggle()) {
+      System.out.println("extention toggle");
       intake.toggleExtension();
     }
     if(oi.getIntakeToggle()) {
@@ -93,12 +112,17 @@ public class Robot extends TimedRobot {
       } else {
         compressor.start();
       }
-    }*/
+    }
     if(oi.getRawButtonPressed(14)) {
       System.out.println("zero Encoders");
       swerveDrive.zeroEncoders();
     }
     if(oi.getRawButtonPressed(1)) {
+      System.out.println("logged");
+      swerveDrive.saveLog();
+      navXLogger.saveDataToCSV("accel.csv");
+    }
+    /*if(oi.getRawButtonPressed(1)) {
 
       swerveDrive.printModuleEncoders((short)0);
     }
@@ -110,7 +134,7 @@ public class Robot extends TimedRobot {
     }
     if(oi.getRawButtonPressed(4)) {
       swerveDrive.printModuleEncoders((short)3);
-    }
+    }*/
   }
 
   /** This function is called once when the robot is disabled. */
@@ -123,9 +147,30 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() {
+    swerveDrive.zeroYaw();
+    swerveDrive.zeroDriveEncoders();
+    this.time = System.currentTimeMillis();
+    this.speed += 0.1;
+    this.driving = true;
+  }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    this.navXLogger.run();
+    long timePassed = System.currentTimeMillis() - this.time;
+    if(timePassed < 500) {
+      swerveDrive.drive(0, 0, 0);
+    } else if(oi.getRawButtonPressed(2)) {
+      this.driving = false;
+    } else if(this.driving) {
+      //swerveDrive.drive(0, 0.3, 0);
+      swerveDrive.drive(0, this.speed, 0);
+    } else {
+      swerveDrive.drive(0,0,0);
+    }
+    //System.out.println(swerveDrive.avgEncoderValue());
+    swerveDrive.log();
+  }
 }

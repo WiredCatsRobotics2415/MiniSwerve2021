@@ -21,6 +21,8 @@ public class SwerveDrive {
 
     public static final double TURNING_KP = 0.015, TURNING_KD = 0.0, MAX_ADJUSTMENT = 0.3;
 
+    private int specialMode;
+
     public SwerveDrive() {
         this(false, false);
     }
@@ -46,16 +48,19 @@ public class SwerveDrive {
         this.navX = new AHRS(Port.kMXP);
         this.maxModuleRadius = Math.max(Math.max(this.frontLeftModule.getRadius(), this.frontRightModule.getRadius()),
                 Math.max(this.backLeftModule.getRadius(), this.backRightModule.getRadius()));
+        this.specialMode = 0;
     }
 
     public void zeroYaw() {
         navX.zeroYaw();
     }
 
-    public void drive(double x, double y, double r) {
+    public void drive(double x, double y, double r, boolean fieldOriented) {
         Vector2D strafeVector = Vector2D.vectorFromRectForm(x, y);
-        double yaw = navX.getYaw();
-        strafeVector = strafeVector.rotate(yaw, true);
+        if(fieldOriented) {
+            double yaw = navX.getYaw();
+            strafeVector = strafeVector.rotate(yaw, true);
+        }
         /*if (r == 0 && strafeVector.getLength() != 0) {
             r = (prevAngle - yaw) * TURNING_KP
                     + ((prevAngle - yaw) / (System.currentTimeMillis() - prevTime)) * TURNING_KD;
@@ -80,6 +85,36 @@ public class SwerveDrive {
         frontRightModule.setVector(fRVector);
         backLeftModule.setVector(bLVector);
         backRightModule.setVector(bRVector);
+    }
+
+    public void drive(double x, double y, double r) {
+        if(this.specialMode == 1 || this.specialMode == 2) {
+            double value = Math.hypot(x, y);
+            if(this.specialMode == 1) {
+                r = value*0.42;
+            } else {
+                r = value*-0.42;
+            }
+            this.drive(0,value,r,false);
+            return;
+        }
+        this.drive(x,y,r,true);
+    }
+
+    public void toogleRightTurning() {
+        if(this.specialMode != 1) {
+            this.specialMode = 1;
+        } else {
+            this.specialMode = 0;
+        }
+    }
+
+    public void toogleLeftTurning() {
+        if(this.specialMode != 2) {
+            this.specialMode = 2;
+        } else {
+            this.specialMode = 0;
+        }
     }
 
     public void printEncoderValues() {
@@ -138,10 +173,32 @@ public class SwerveDrive {
         return module;
     }
 
+    public void log() {
+        frontLeftModule.log();
+        frontRightModule.log();
+        backLeftModule.log();
+        backRightModule.log();
+    }
+
     public void saveLog() {
         frontLeftModule.saveLog();
         frontRightModule.saveLog();
         backLeftModule.saveLog();
         backRightModule.saveLog();
+    }
+
+    public void zeroDriveEncoders() {
+        frontLeftModule.zeroDriveEncoder();
+        frontRightModule.zeroDriveEncoder();
+        backLeftModule.zeroDriveEncoder();
+        backRightModule.zeroDriveEncoder();
+    }
+
+    public double avgEncoderValue() {
+        return (Math.abs(frontLeftModule.getDrivePosition())+Math.abs(frontRightModule.getDrivePosition())+Math.abs(backLeftModule.getDrivePosition())+Math.abs(backRightModule.getDrivePosition()))/4.0;
+    }
+
+    public AHRS getNavX() {
+        return this.navX;
     }
 }

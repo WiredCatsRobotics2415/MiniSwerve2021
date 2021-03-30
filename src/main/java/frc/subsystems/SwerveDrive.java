@@ -201,4 +201,11 @@ public class SwerveDrive {
     public AHRS getNavX() {
         return this.navX;
     }
+
+    public void printCurrents() {
+        frontLeftModule.printCurrent();
+        frontRightModule.printCurrent();
+        backLeftModule.printCurrent();
+        backRightModule.printCurrent();
+    }
 }

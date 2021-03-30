@@ -56,7 +56,7 @@ public class SwerveModule {
         this.azimuthMotor.configSelectedFeedbackCoefficient(360.0/(2048*56.0/3.0), 0, Constants.kCanTimeoutMs);
 
         this.driveMotor.setNeutralMode(Constants.DRIVE_BREAK_MODE);
-        this.azimuthMotor.setNeutralMode(Constants.DRIVE_BREAK_MODE);
+        this.azimuthMotor.setNeutralMode(NeutralMode.Coast);
         this.driveMotor.setInverted(false);
         this.azimuthMotor.setInverted(false);
 
@@ -150,7 +150,7 @@ public class SwerveModule {
             System.out.println("failed zero");
             error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0, Constants.kCanTimeoutMs);
         }
-        this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
+        //this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
     }
 
     public void zeroDriveEncoder() {
@@ -211,6 +211,10 @@ public class SwerveModule {
     public void log() {
         if(this.logger == null) return;
         this.logger.run();
+    }
+
+    public void printCurrent() {
+        System.out.println(this.name+" "+this.driveMotor.getStatorCurrent());
     }
 
     public void printAzimuthTalonEncoderValue() {

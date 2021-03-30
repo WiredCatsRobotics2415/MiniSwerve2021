@@ -97,8 +97,8 @@ public class Robot extends TimedRobot {
     } else if(oi.getLeftTurningToggle()) {
       swerveDrive.toogleLeftTurning();
     }
-    swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
-    if(oi.getIntakeExtensionToggle()) {
+    //swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
+    /*if(oi.getIntakeExtensionToggle()) {
       System.out.println("extention toggle");
       intake.toggleExtension();
     }
@@ -121,9 +121,9 @@ public class Robot extends TimedRobot {
       System.out.println("logged");
       swerveDrive.saveLog();
       navXLogger.saveDataToCSV("accel.csv");
-    }
-    /*if(oi.getRawButtonPressed(1)) {
-
+    }*/
+    //swerveDrive.printCurrents();
+    if(oi.getRawButtonPressed(1)) {
       swerveDrive.printModuleEncoders((short)0);
     }
     if(oi.getRawButtonPressed(2)) {
@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
     }
     if(oi.getRawButtonPressed(4)) {
       swerveDrive.printModuleEncoders((short)3);
-    }*/
+    }
   }
 
   /** This function is called once when the robot is disabled. */

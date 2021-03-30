@@ -13,11 +13,11 @@ public class Constants {
     public static final PIDValue BACK_LEFT_AZIMUTH_PID = new PIDValue(22, 0.0, 66);
     public static final PIDValue BACK_RIGHT_AZIMUTH_PID = new PIDValue(30, 0.0, 55);
 
-    public static final double FRONT_LEFT_AZIMUTH_ENCODER_OFFSET = 304-180; // offset by 90
-    public static final double FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET = 5.976+180;
+    public static final double FRONT_LEFT_AZIMUTH_ENCODER_OFFSET = 304.56-180;//304-180; // offset by 90
+    public static final double FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET = 4.56+180;//5.976+180;
     public static final double MOTORMIN = 0.05;
-    public static final double BACK_LEFT_AZIMUTH_ENCODER_OFFSET = 219.7;
-    public static final double BACK_RIGHT_AZIMUTH_ENCODER_OFFSET = 211.6;
+    public static final double BACK_LEFT_AZIMUTH_ENCODER_OFFSET = 218;//219.7;
+    public static final double BACK_RIGHT_AZIMUTH_ENCODER_OFFSET = 211;//211.6;
     public static final double DEADBAND = 0.1;
 
     public static NeutralMode DRIVE_BREAK_MODE = NeutralMode.Brake;

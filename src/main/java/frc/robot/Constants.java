@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import frc.util.logging.SwerveModuleLogger.SwerveModuleLoggerMode;
+import frc.util.pid.PIDFValue;
 import frc.util.pid.PIDValue;
 
 public class Constants {
@@ -12,6 +13,15 @@ public class Constants {
     public static final PIDValue FRONT_RIGHT_AZIMUTH_PID = new PIDValue(20, 0.0, 60);
     public static final PIDValue BACK_LEFT_AZIMUTH_PID = new PIDValue(22, 0.0, 66);
     public static final PIDValue BACK_RIGHT_AZIMUTH_PID = new PIDValue(30, 0.0, 55);
+
+    public static final PIDFValue FRONT_LEFT_VEL_DRIVE_PIDF = new PIDFValue(0.0, 0.0, 0.0, 0.0);
+    public static final PIDFValue FRONT_RIGHT_VEL_DRIVE_PIDF = new PIDFValue(0.0, 0.0, 0.0, 0.0);
+    public static final PIDFValue BACK_LEFT_VEL_DRIVE_PIDF = new PIDFValue(0.0, 0.0, 0.0, 0.0);
+    public static final PIDFValue BACK_RIGHT_VEL_DRIVE_PIDF = new PIDFValue(0.0, 0.0, 0.0, 0.0);
+    
+    public static final PIDValue DRIVE_DISTANCE_PID = new PIDValue(0.0, 0.0, 0.0);
+
+    public static final double KS = 0.0, KV = 0.0, KA = 0.0;
 
     public static final double FRONT_LEFT_AZIMUTH_ENCODER_OFFSET = 304.56-180;//304-180; // offset by 90
     public static final double FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET = 4.56+180;//5.976+180;

@@ -1,6 +1,7 @@
 package frc.util.pid;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import frc.robot.Constants;
@@ -10,14 +11,14 @@ public class TalonFxTunable implements PIDTunable{
     private final TalonFX talon;
     private PIDTuner tuner;
 
-
     private boolean tuning;
+    private ControlMode controlMode;
 
-    public TalonFxTunable(TalonFX talon, double kP, double kI, double kD) {
-        this(talon, new PIDValue(kP, kI, kD));
+    public TalonFxTunable(TalonFX talon, double kP, double kI, double kD, ControlMode controlMode) { //must pre conifg talon with PID
+        this(talon, new PIDValue(kP, kI, kD), controlMode);
     }
 
-    public TalonFxTunable(TalonFX talon, PIDValue pidValue) {
+    public TalonFxTunable(TalonFX talon, PIDValue pidValue, ControlMode controlMode) {
         this.talon = talon;
         this.pidValue = pidValue;
         this.setPID(pidValue.getKP(), pidValue.getKI(), pidValue.getKD());
@@ -25,8 +26,8 @@ public class TalonFxTunable implements PIDTunable{
         this.tuning = false;
     }
 
-    public TalonFxTunable(TalonFX talon, PIDValue pidValue, boolean tuning, String name) {
-        this(talon, pidValue);
+    public TalonFxTunable(TalonFX talon, PIDValue pidValue, ControlMode controlMode, boolean tuning, String name) {
+        this(talon, pidValue, controlMode);
         this.tuning = tuning;
         if(this.tuning) {
             this.tuner = new PIDTuner(this, name);
@@ -73,7 +74,11 @@ public class TalonFxTunable implements PIDTunable{
 
     @Override
     public void setSetpoint(double setpoint) {
-        talon.set(ControlMode.Position, setpoint);
+        talon.set(this.controlMode, setpoint);
+    }
+
+    public void setSetpointWithFF(double setpoint, double ff) {
+        talon.set(this.controlMode, setpoint, DemandType.ArbitraryFeedForward, ff);
     }
 
     public void run() {

@@ -7,6 +7,7 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.subsystems.Intake;
 import frc.subsystems.SwerveDrive;
@@ -24,6 +25,7 @@ public class Robot extends TimedRobot {
   public static Intake intake;
   public static Compressor compressor;
   public static AHRS navX;
+  public static PowerDistributionPanel pdp = new PowerDistributionPanel(RobotMap.PDP_ID); 
 
   public static OI oi;
 
@@ -172,5 +174,9 @@ public class Robot extends TimedRobot {
     }
     //System.out.println(swerveDrive.avgEncoderValue());
     swerveDrive.log();
+  }
+
+  public static double getPDPVoltage() {
+    return pdp.getVoltage();
   }
 }

@@ -14,6 +14,7 @@ import frc.util.logging.MotorLogger;
 import frc.util.logging.SwerveModuleLogger;
 import frc.util.logging.SwerveModuleLogger.SwerveModuleLoggerMode;
 import frc.util.PWMAbsoluteEncoder;
+import frc.util.pid.PIDFValue;
 import frc.util.pid.PIDValue;
 import frc.util.pid.TalonFxTunable;
 import frc.robot.Constants;
@@ -26,10 +27,11 @@ public class SwerveModule {
     private final PWMAbsoluteEncoder azimuthEncoder; // absolute encoder
 
     private final TalonFxTunable azimuthController;
+    private final TalonFxTunable driveController;
 
     private MotorLogger logger;
 
-    private final double positionX, positionY, radius;
+    public final double positionX, positionY, radius;
 
     private double prevAzimuthSetpoint;
     private int turns;
@@ -37,8 +39,8 @@ public class SwerveModule {
     private String name;
 
     public SwerveModule(int driveMotorID, int azimuthMotorID, boolean azimuthRev, int azimuthEncoderChannel,
-            double positionX, double positionY, PIDValue pidValues, double azimuthEncoderOffset,
-            boolean azimuthEncoderReversed) {
+            double positionX, double positionY, PIDValue azimuthPidValues, double azimuthEncoderOffset,
+            boolean azimuthEncoderReversed, PIDFValue drivePIDF) {
         this.driveMotor = new TalonFX(driveMotorID);
         this.azimuthMotor = new TalonFX(azimuthMotorID);
 
@@ -71,9 +73,14 @@ public class SwerveModule {
         this.driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, .1));
         this.azimuthMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, .1));
         
-        this.azimuthMotor.config_kP(0,pidValues.getKP(), Constants.kCanTimeoutMs);
-        this.azimuthMotor.config_kI(0,pidValues.getKI(), Constants.kCanTimeoutMs);
-        this.azimuthMotor.config_kD(0,pidValues.getKD(), Constants.kCanTimeoutMs);
+        this.azimuthMotor.config_kP(0,azimuthPidValues.getKP(), Constants.kCanTimeoutMs);
+        this.azimuthMotor.config_kI(0,azimuthPidValues.getKI(), Constants.kCanTimeoutMs);
+        this.azimuthMotor.config_kD(0,azimuthPidValues.getKD(), Constants.kCanTimeoutMs);
+
+        this.driveMotor.config_kP(0,drivePIDF.getKP(), Constants.kCanTimeoutMs);
+        this.driveMotor.config_kI(0,drivePIDF.getKI(), Constants.kCanTimeoutMs);
+        this.driveMotor.config_kD(0,drivePIDF.getKD(), Constants.kCanTimeoutMs);
+        this.driveMotor.config_kF(0,drivePIDF.getKF(), Constants.kCanTimeoutMs); //needs to be 0 if you are doing feedforward already
         
         this.azimuthMotor.configAllowableClosedloopError(0, 4.0, Constants.kCanTimeoutMs);
 
@@ -86,7 +93,8 @@ public class SwerveModule {
 
         this.azimuthReversed = false;
 
-        this.azimuthController = new TalonFxTunable(this.azimuthMotor, pidValues);
+        this.azimuthController = new TalonFxTunable(this.azimuthMotor, azimuthPidValues, ControlMode.Position);
+        this.driveController = new TalonFxTunable(this.driveMotor, drivePIDF, ControlMode.Velocity);
 
         this.zeroEncoder();
 
@@ -99,9 +107,9 @@ public class SwerveModule {
 
     public SwerveModule(int driveMotorID, int azimuthMotorID, boolean azimuthRev, int azimuthEncoderChannel,
             double positionX, double positionY, PIDValue pidValues, double azimuthEncoderOffset,
-            boolean azimuthEncoderReversed, boolean azimuthTuning, boolean logging, String name) {
+            boolean azimuthEncoderReversed, PIDFValue drivePIDF, boolean azimuthTuning, boolean logging, String name) {
         this(driveMotorID, azimuthMotorID, azimuthRev, azimuthEncoderChannel, positionX, positionY, pidValues,
-                azimuthEncoderOffset, azimuthEncoderReversed);
+                azimuthEncoderOffset, azimuthEncoderReversed,drivePIDF);
         if(azimuthTuning) {
             this.azimuthController.enableTuning(name);
         }
@@ -124,6 +132,19 @@ public class SwerveModule {
         }
     }
 
+    public void setVelocityVectorWithFF(Vector2D vector, double ff) {
+        if (vector.getLength() != 0) {
+            setAngle(vector.getAngleDeg());
+        } else {
+            azimuthController.run();
+        }
+        if (azimuthReversed) {
+            setDriveVelocityWithFF(vector.getLength() * -1, ff);
+        } else {
+            setDriveVelocityWithFF(vector.getLength(), ff);
+        }
+    }
+
     public void setAngle(double degrees) { // must be called every 20ms
         //double encoderValue = azimuthMotor.getSelectedSensorPosition(0);
         //double currentDirection = Vector2D.modulus(encoderValue,360);//azimuthEncoder.getRotationDegrees();
@@ -141,6 +162,14 @@ public class SwerveModule {
         this.azimuthController.setSetpoint(degrees+turns*360.0);
         this.azimuthController.run();
         this.prevAzimuthSetpoint = degrees;
+    }
+
+    public void setPercentSpeed(double percent) {
+        this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
+    }
+
+    public void setDriveVelocityWithFF(double velocity, double ff) {
+        this.driveController.setSetpointWithFF(velocity, ff);
     }
 
     public void zeroEncoder() {
@@ -166,10 +195,6 @@ public class SwerveModule {
         if(this.logger != null) {
             this.logger.saveDataToCSV(this.name+"logging.csv");
         }
-    }
-
-    public void setPercentSpeed(double percent) {
-        this.driveMotor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
     public double getDrivePosition() {

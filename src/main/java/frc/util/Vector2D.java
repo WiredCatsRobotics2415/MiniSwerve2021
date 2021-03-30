@@ -57,8 +57,17 @@ public class Vector2D {
         return new Vector2D(length * scaler, radians);
     }
 
-    public static Vector2D addVectors(Vector2D v1, Vector2D v2) {
-        return vectorFromRectForm(v1.getX() + v2.getX(), v1.getY() + v2.getY());
+    public double dot(Vector2D b) {
+        return this.getX()*b.getX()+this.getY()*b.getY();
+    }
+
+    public static Vector2D addVectors(Vector2D ...vectors) {
+        double x = 0, y = 0;
+        for(Vector2D v:vectors) {
+            x += v.getX();
+            y += v.getY();
+        }
+        return vectorFromRectForm(x, y);
     }
 
     public static double modulus(double amount, double divisor) {

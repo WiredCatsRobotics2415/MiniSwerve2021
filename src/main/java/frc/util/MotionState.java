@@ -14,4 +14,9 @@ public class MotionState {
         this.accel = accel;
         this.alpha = alpha;
     }
+
+    @Override
+    public String toString() {
+        return "time:"+time+" x:"+x+" y:"+y+" theta:"+theta+" vel:"+velocity+" direction:"+direction+" omega:"+omega+" accel:"+accel+" alpha"+alpha;
+    }
 }

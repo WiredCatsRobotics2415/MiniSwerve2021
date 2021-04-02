@@ -33,6 +33,8 @@ public class SwerveModule {
 
     public final double positionX, positionY, radius;
 
+    public static final double UNITS_TO_FT_DRIVE = 3.2*3.1415/(12*7.0*2048.0);
+
     private double prevAzimuthSetpoint;
     private int turns;
     private boolean azimuthReversed;
@@ -58,7 +60,7 @@ public class SwerveModule {
         this.azimuthMotor.configSelectedFeedbackCoefficient(360.0/(2048*56.0/3.0), 0, Constants.kCanTimeoutMs);
 
         this.driveMotor.setNeutralMode(Constants.DRIVE_BREAK_MODE);
-        this.azimuthMotor.setNeutralMode(NeutralMode.Coast);
+        this.azimuthMotor.setNeutralMode(NeutralMode.Brake);
         this.driveMotor.setInverted(false);
         this.azimuthMotor.setInverted(false);
 
@@ -133,13 +135,15 @@ public class SwerveModule {
     }
 
     public void setVelocityVectorWithFF(Vector2D vector, double ff) {
-        if (vector.getLength() != 0) {
+        if (Math.abs(vector.getLength()) > 0.1) {
             setAngle(vector.getAngleDeg());
+            vector = vector.scale(0);
         } else {
             azimuthController.run();
         }
+        vector.scale(UNITS_TO_FT_DRIVE);
         if (azimuthReversed) {
-            setDriveVelocityWithFF(vector.getLength() * -1, ff);
+            setDriveVelocityWithFF(vector.getLength() * -1, -ff);
         } else {
             setDriveVelocityWithFF(vector.getLength(), ff);
         }
@@ -203,6 +207,10 @@ public class SwerveModule {
 
     public double getDriveVoltage() {
         return this.driveMotor.getMotorOutputVoltage();
+    }
+
+    public double getDriveVelocity() {
+        return this.driveMotor.getSelectedSensorVelocity(0);
     }
 
     public double getDriveCurrent() {

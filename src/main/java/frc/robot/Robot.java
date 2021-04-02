@@ -7,10 +7,14 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.subsystems.Intake;
 import frc.subsystems.SwerveDrive;
+import frc.util.CSVReader;
+import frc.util.PathFollowerController;
+import frc.util.SwerveOdometry;
 import frc.util.logging.MotorLogger;
 import frc.util.logging.NavXLogger;
 
@@ -26,6 +30,8 @@ public class Robot extends TimedRobot {
   public static Compressor compressor;
   public static AHRS navX;
   public static PowerDistributionPanel pdp = new PowerDistributionPanel(RobotMap.PDP_ID); 
+  public static PathFollowerController pathController;
+  public static SwerveOdometry odometry;
 
   public static OI oi;
 
@@ -44,6 +50,7 @@ public class Robot extends TimedRobot {
     navX = swerveDrive.getNavX();
     this.navXLogger = new MotorLogger(new NavXLogger(navX));
     //swerveDrive.drive(0, 0, 0);
+    odometry = new SwerveOdometry(swerveDrive);
 
     oi = new OI();
 
@@ -78,11 +85,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    CSVReader csvReader = new CSVReader(Filesystem.getDeployDirectory()+"/traject.csv");
+    pathController = new PathFollowerController(swerveDrive, csvReader.getValues(), Constants.KS, Constants.KV, Constants.KA, 1, Constants.DRIVE_DISTANCE_PID,true);
+    pathController.start();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    pathController.run();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -94,13 +105,15 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    odometry.iterate();
+    //System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
     if(oi.getRightTurningToggle()) {
       swerveDrive.toogleRightTurning();
     } else if(oi.getLeftTurningToggle()) {
       swerveDrive.toogleLeftTurning();
     }
-    //swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
-    /*if(oi.getIntakeExtensionToggle()) {
+    swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
+    if(oi.getIntakeExtensionToggle()) {
       System.out.println("extention toggle");
       intake.toggleExtension();
     }
@@ -119,13 +132,13 @@ public class Robot extends TimedRobot {
       System.out.println("zero Encoders");
       swerveDrive.zeroEncoders();
     }
-    if(oi.getRawButtonPressed(1)) {
+    /*if(oi.getRawButtonPressed(1)) {
       System.out.println("logged");
       swerveDrive.saveLog();
       navXLogger.saveDataToCSV("accel.csv");
     }*/
     //swerveDrive.printCurrents();
-    if(oi.getRawButtonPressed(1)) {
+    /*if(oi.getRawButtonPressed(1)) {
       swerveDrive.printModuleEncoders((short)0);
     }
     if(oi.getRawButtonPressed(2)) {
@@ -136,7 +149,7 @@ public class Robot extends TimedRobot {
     }
     if(oi.getRawButtonPressed(4)) {
       swerveDrive.printModuleEncoders((short)3);
-    }
+    }*/
   }
 
   /** This function is called once when the robot is disabled. */

@@ -24,6 +24,7 @@ public class TalonFxTunable implements PIDTunable{
         this.setPID(pidValue.getKP(), pidValue.getKI(), pidValue.getKD());
         this.tuner = null;
         this.tuning = false;
+        this.controlMode = controlMode;
     }
 
     public TalonFxTunable(TalonFX talon, PIDValue pidValue, ControlMode controlMode, boolean tuning, String name) {

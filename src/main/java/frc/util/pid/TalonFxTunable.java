@@ -6,7 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import frc.robot.Constants;
 
-public class TalonFxTunable implements PIDTunable{
+public class TalonFxTunable implements PIDTunable {
     private final PIDValue pidValue;
     private final TalonFX talon;
     private PIDTuner tuner;
@@ -14,7 +14,8 @@ public class TalonFxTunable implements PIDTunable{
     private boolean tuning;
     private ControlMode controlMode;
 
-    public TalonFxTunable(TalonFX talon, double kP, double kI, double kD, ControlMode controlMode) { //must pre conifg talon with PID
+    public TalonFxTunable(TalonFX talon, double kP, double kI, double kD, ControlMode controlMode) {
+        // must pre config talon with PID 
         this(talon, new PIDValue(kP, kI, kD), controlMode);
     }
 
@@ -30,7 +31,7 @@ public class TalonFxTunable implements PIDTunable{
     public TalonFxTunable(TalonFX talon, PIDValue pidValue, ControlMode controlMode, boolean tuning, String name) {
         this(talon, pidValue, controlMode);
         this.tuning = tuning;
-        if(this.tuning) {
+        if (this.tuning) {
             this.tuner = new PIDTuner(this, name);
         }
     }
@@ -68,7 +69,8 @@ public class TalonFxTunable implements PIDTunable{
     }
 
     public void enableTuning(String name) {
-        if(tuning) return;
+        if (tuning)
+            return;
         this.tuning = true;
         this.tuner = new PIDTuner(this, name);
     }
@@ -83,7 +85,7 @@ public class TalonFxTunable implements PIDTunable{
     }
 
     public void run() {
-        if(tuning) {
+        if (tuning) {
             this.tuner.update();
         }
     }

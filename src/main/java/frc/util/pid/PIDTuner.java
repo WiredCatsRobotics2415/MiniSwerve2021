@@ -16,9 +16,9 @@ public class PIDTuner {
     public PIDTuner(PIDTunable controller, String name) {
         this.controller = controller;
         this.tuner = Shuffleboard.getTab(name);
-        this.kPEntry = this.tuner.add("kP",this.controller.getKP()).getEntry();
-        this.kIEntry = this.tuner.add("kI",this.controller.getKI()).getEntry();
-        this.kDEntry = this.tuner.add("kD",this.controller.getKD()).getEntry();
+        this.kPEntry = this.tuner.add("kP", this.controller.getKP()).getEntry();
+        this.kIEntry = this.tuner.add("kI", this.controller.getKI()).getEntry();
+        this.kDEntry = this.tuner.add("kD", this.controller.getKD()).getEntry();
         this.errorEntry = this.tuner.add("Error", 0).getEntry();
         this.setpointEntry = this.tuner.add("Setpoint", 0).getEntry();
     }

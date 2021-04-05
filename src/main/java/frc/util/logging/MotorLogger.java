@@ -17,15 +17,15 @@ public class MotorLogger implements Runnable {
     }
 
     public void run() {
-        if(!this.started) {
+        if (!this.started) {
             this.initialTime = System.currentTimeMillis();
             this.started = true;
         }
         double[] deviceData = device.getLogOutput();
-        double[] entry = new double[deviceData.length+1];
+        double[] entry = new double[deviceData.length + 1];
         entry[0] = (System.currentTimeMillis() - initialTime) / 1000.0;
-        for(int i = 1; i < entry.length; i++) {
-            entry[i] = deviceData[i-1];
+        for (int i = 1; i < entry.length; i++) {
+            entry[i] = deviceData[i - 1];
         }
         data.add(entry);
     }

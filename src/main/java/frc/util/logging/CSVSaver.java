@@ -20,13 +20,13 @@ public class CSVSaver {
                 System.out.println("Failed to create Log directory!");
             }
         }
-        path += "/"+filename;
+        path += "/" + filename;
         file = new File(path);
         saveFile(file, data);
     }
 
     public static void saveFile(File file, List<double[]> data) {
-        if(file.exists()) {
+        if (file.exists()) {
             System.out.println("deleted files");
             file.delete();
         }

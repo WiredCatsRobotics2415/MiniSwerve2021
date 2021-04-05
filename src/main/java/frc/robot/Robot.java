@@ -19,9 +19,10 @@ import frc.util.logging.MotorLogger;
 import frc.util.logging.NavXLogger;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
@@ -29,7 +30,7 @@ public class Robot extends TimedRobot {
   public static Intake intake;
   public static Compressor compressor;
   public static AHRS navX;
-  public static PowerDistributionPanel pdp = new PowerDistributionPanel(RobotMap.PDP_ID); 
+  public static PowerDistributionPanel pdp = new PowerDistributionPanel(RobotMap.PDP_ID);
   public static PathFollowerController pathController;
   public static SwerveOdometry odometry;
 
@@ -40,16 +41,17 @@ public class Robot extends TimedRobot {
   private MotorLogger navXLogger;
   private double speed = 0.0;
   private boolean driving = false;
+
   /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
+   * This function is run when the robot is first started up and should be used
+   * for any initialization code.
    */
   @Override
   public void robotInit() {
     swerveDrive = new SwerveDrive(Constants.SWERVE_TUNING, Constants.SWERVE_LOGGING);
     navX = swerveDrive.getNavX();
     this.navXLogger = new MotorLogger(new NavXLogger(navX));
-    //swerveDrive.drive(0, 0, 0);
+    // swerveDrive.drive(0, 0, 0);
     odometry = new SwerveOdometry(swerveDrive);
 
     oi = new OI();
@@ -64,29 +66,35 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
+   * This function is called every robot packet, no matter the mode. Use this for
+   * items like diagnostics that you want ran during disabled, autonomous,
+   * teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+  }
 
   /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
+   * This autonomous (along with the chooser code above) shows how to select
+   * between different autonomous modes using the dashboard. The sendable chooser
+   * code works with the Java SmartDashboard. If you prefer the LabVIEW Dashboard,
+   * remove all of the chooser code and uncomment the getString line to get the
+   * auto name from the text box below the Gyro
    *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
+   * <p>
+   * You can add additional auto modes by adding additional comparisons to the
+   * switch structure below with additional strings. If using the SendableChooser
+   * make sure to add them to the chooser code above as well.
    */
   @Override
   public void autonomousInit() {
-    CSVReader csvReader = new CSVReader(Filesystem.getDeployDirectory()+"/traject.csv");
-    pathController = new PathFollowerController(swerveDrive, csvReader.getValues(), Constants.KS, Constants.KV, Constants.KA, 1, Constants.DRIVE_DISTANCE_PID,true);
+    CSVReader csvReader = new CSVReader(Filesystem.getDeployDirectory() + "/traject.csv");
+    pathController = new PathFollowerController(swerveDrive, csvReader.getValues(), Constants.KS, Constants.KV,
+        Constants.KA, 1, Constants.DRIVE_DISTANCE_PID, true);
     pathController.start();
   }
 
@@ -106,59 +114,54 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     odometry.iterate();
-    //System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
-    if(oi.getRightTurningToggle()) {
-      swerveDrive.toogleRightTurning();
-    } else if(oi.getLeftTurningToggle()) {
-      swerveDrive.toogleLeftTurning();
+    // System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
+    if (oi.getRightTurningToggle()) {
+      swerveDrive.toggleRightTurning();
+    } else if (oi.getLeftTurningToggle()) {
+      swerveDrive.toggleLeftTurning();
     }
     swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
-    if(oi.getIntakeExtensionToggle()) {
+    if (oi.getIntakeExtensionToggle()) {
       System.out.println("extention toggle");
       intake.toggleExtension();
     }
-    if(oi.getIntakeToggle()) {
+    if (oi.getIntakeToggle()) {
       intake.toggleIntaking();
     }
-    if(oi.getCompressingToggle()) {
+    if (oi.getCompressorToggle()) {
       System.out.println("Compressor toggle");
-      if(compressor.enabled()) {
+      if (compressor.enabled()) {
         compressor.stop();
       } else {
         compressor.start();
       }
     }
-    if(oi.getRawButtonPressed(14)) {
+    if (oi.getRawButtonPressed(14)) {
       System.out.println("zero Encoders");
       swerveDrive.zeroEncoders();
     }
-    /*if(oi.getRawButtonPressed(1)) {
-      System.out.println("logged");
-      swerveDrive.saveLog();
-      navXLogger.saveDataToCSV("accel.csv");
-    }*/
-    //swerveDrive.printCurrents();
-    /*if(oi.getRawButtonPressed(1)) {
-      swerveDrive.printModuleEncoders((short)0);
-    }
-    if(oi.getRawButtonPressed(2)) {
-      swerveDrive.printModuleEncoders((short)1);
-    }
-    if(oi.getRawButtonPressed(3)) {
-      swerveDrive.printModuleEncoders((short)2);
-    }
-    if(oi.getRawButtonPressed(4)) {
-      swerveDrive.printModuleEncoders((short)3);
-    }*/
+    /*
+     * if(oi.getRawButtonPressed(1)) { System.out.println("logged");
+     * swerveDrive.saveLog(); navXLogger.saveDataToCSV("accel.csv"); }
+     */
+    // swerveDrive.printCurrents();
+    /*
+     * if(oi.getRawButtonPressed(1)) { swerveDrive.printModuleEncoders((short)0); }
+     * if(oi.getRawButtonPressed(2)) { swerveDrive.printModuleEncoders((short)1); }
+     * if(oi.getRawButtonPressed(3)) { swerveDrive.printModuleEncoders((short)2); }
+     * if(oi.getRawButtonPressed(4)) { swerveDrive.printModuleEncoders((short)3); }
+     */
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
@@ -175,17 +178,17 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     this.navXLogger.run();
     long timePassed = System.currentTimeMillis() - this.time;
-    if(timePassed < 500) {
+    if (timePassed < 500) {
       swerveDrive.drive(0, 0, 0);
-    } else if(oi.getRawButtonPressed(2)) {
+    } else if (oi.getRawButtonPressed(2)) {
       this.driving = false;
-    } else if(this.driving) {
-      //swerveDrive.drive(0, 0.3, 0);
+    } else if (this.driving) {
+      // swerveDrive.drive(0, 0.3, 0);
       swerveDrive.drive(0, this.speed, 0);
     } else {
-      swerveDrive.drive(0,0,0);
+      swerveDrive.drive(0, 0, 0);
     }
-    //System.out.println(swerveDrive.avgEncoderValue());
+    // System.out.println(swerveDrive.avgEncoderValue());
     swerveDrive.log();
   }
 

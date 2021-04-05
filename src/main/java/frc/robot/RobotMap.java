@@ -1,7 +1,7 @@
 package frc.robot;
 
 public class RobotMap {
-    
+
     public static final int FRONT_LEFT_SWERVE_AZIMUTH = 32;
     public static final int FRONT_RIGHT_SWERVE_AZIMUTH = 20;
     public static final int BACK_LEFT_SWERVE_AZIMUTH = 23;
@@ -28,21 +28,21 @@ public class RobotMap {
     public static final boolean BACK_RIGHT_AZIMUTH_ENCODER_REV = true;
 
     public static final double FRONT_LEFT_MODULE_X = -1, FRONT_LEFT_MODULE_Y = 1; // inches
-    public static final double FRONT_RIGHT_MODULE_X = 1, FRONT_RIGHT_MODULE_Y = 1; //quick values for sqare robot
+    public static final double FRONT_RIGHT_MODULE_X = 1, FRONT_RIGHT_MODULE_Y = 1; // quick values for sqare robot
     public static final double BACK_LEFT_MODULE_X = -1, BACK_LEFT_MODULE_Y = -1;
     public static final double BACK_RIGHT_MODULE_X = 1, BACK_RIGHT_MODULE_Y = -1;
 
     public static final double CENTER_OF_MASS_X = 0;
     public static final double CENTER_OF_MASS_Y = 0;
 
-    //Intake
+    // Intake
     public static final int INTAKE_MOTOR = 24;
-    public static final int INTAKE_LEFT_FORWARD_SOLENNOID = 2;
-    public static final int INTAKE_LEFT_REVERSE_SOLENNOID = 3;
-    public static final int INTAKE_RIGHT_FORWARD_SOLENNOID = 5;
-    public static final int INTAKE_RIGHT_REVERSE_SOLENNOID = 4;
+    public static final int INTAKE_LEFT_FORWARD_SOLENOID = 2;
+    public static final int INTAKE_LEFT_REVERSE_SOLENOID = 3;
+    public static final int INTAKE_RIGHT_FORWARD_SOLENOID = 5;
+    public static final int INTAKE_RIGHT_REVERSE_SOLENOID = 4;
 
-    //PCM
+    // PCM
     public static final int PCM_ID = 10;
     public static final int PDP_ID = 5;
 }

@@ -22,7 +22,7 @@ public class SwerveModuleLogger implements Loggable {
 
     @Override
     public double[] getLogOutput() {
-        switch(this.mode) {
+        switch (this.mode) {
             case DRIVE:
                 return this.getDriveOutput();
             case DRIVE_WCURRENT:

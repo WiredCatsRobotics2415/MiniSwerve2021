@@ -4,7 +4,7 @@ public class PIDFValue extends PIDValue {
     private double kF;
 
     public PIDFValue(double kP, double kI, double kD, double kF) {
-        super(kP,kI,kD);
+        super(kP, kI, kD);
         this.kF = kF;
     }
 
@@ -17,8 +17,8 @@ public class PIDFValue extends PIDValue {
         return this.kF;
     }
 
-    @Override 
+    @Override
     public PIDFValue clone() {
-        return new PIDFValue(super.getKP(),super.getKI(),super.getKD(),this.kF);
+        return new PIDFValue(super.getKP(), super.getKI(), super.getKD(), this.kF);
     }
 }

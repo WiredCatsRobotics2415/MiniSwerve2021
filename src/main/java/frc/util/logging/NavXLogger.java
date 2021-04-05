@@ -22,7 +22,7 @@ public class NavXLogger implements Loggable {
 
     @Override
     public double[] getLogOutput() {
-        switch(this.mode) {
+        switch (this.mode) {
             case ACCELERATION:
                 return this.getDriveOutput();
             default:

@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,8 +13,7 @@ import org.junit.Test;
 
 import frc.util.logging.CSVSaver;
 
-
-public class CSVSaverTester {
+public class CSVSaverTest {
     @Test
     public void CSVWriteTest() {
         try {
@@ -35,7 +33,7 @@ public class CSVSaverTester {
             Scanner scan = new Scanner(file);
             assertEquals("1.0,2.0,3.0", scan.nextLine());
             assertEquals("1.5,2.5,3.5", scan.nextLine());
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             assertEquals(0, 1);
         }
     }

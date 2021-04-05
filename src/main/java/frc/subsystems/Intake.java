@@ -11,17 +11,19 @@ import frc.robot.RobotMap;
 public class Intake {
     private DoubleSolenoid rightSolenoid, leftSolenoid;
     private CANSparkMax intakeMotor;
-    
+
     private boolean extended;
     private boolean intaking;
-    
+
     public Intake() {
-        this.leftSolenoid = new DoubleSolenoid(RobotMap.PCM_ID, RobotMap.INTAKE_LEFT_FORWARD_SOLENNOID, RobotMap.INTAKE_LEFT_REVERSE_SOLENNOID);
-        this.rightSolenoid = new DoubleSolenoid(RobotMap.PCM_ID, RobotMap.INTAKE_RIGHT_FORWARD_SOLENNOID, RobotMap.INTAKE_RIGHT_REVERSE_SOLENNOID);
-        
+        this.leftSolenoid = new DoubleSolenoid(RobotMap.PCM_ID, RobotMap.INTAKE_LEFT_FORWARD_SOLENOID,
+                RobotMap.INTAKE_LEFT_REVERSE_SOLENOID);
+        this.rightSolenoid = new DoubleSolenoid(RobotMap.PCM_ID, RobotMap.INTAKE_RIGHT_FORWARD_SOLENOID,
+                RobotMap.INTAKE_RIGHT_REVERSE_SOLENOID);
+
         this.leftSolenoid.set(Value.kReverse);
         this.rightSolenoid.set(Value.kReverse);
-        
+
         this.intakeMotor = new CANSparkMax(RobotMap.INTAKE_MOTOR, MotorType.kBrushless);
 
         this.intakeMotor.restoreFactoryDefaults();
@@ -46,7 +48,7 @@ public class Intake {
     }
 
     public void toggleExtension() {
-        if(this.extended) {
+        if (this.extended) {
             this.retract();
         } else {
             this.extend();
@@ -64,7 +66,7 @@ public class Intake {
     }
 
     public void toggleIntaking() {
-        if(intaking) {
+        if (intaking) {
             this.stopIntaking();
         } else {
             this.intake();

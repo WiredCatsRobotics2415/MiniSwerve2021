@@ -58,12 +58,12 @@ public class Vector2D {
     }
 
     public double dot(Vector2D b) {
-        return this.getX()*b.getX()+this.getY()*b.getY();
+        return this.getX() * b.getX() + this.getY() * b.getY();
     }
 
-    public static Vector2D addVectors(Vector2D ...vectors) {
+    public static Vector2D addVectors(Vector2D... vectors) {
         double x = 0, y = 0;
-        for(Vector2D v:vectors) {
+        for (Vector2D v : vectors) {
             x += v.getX();
             y += v.getY();
         }

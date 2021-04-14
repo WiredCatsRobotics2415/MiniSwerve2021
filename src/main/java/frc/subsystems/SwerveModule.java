@@ -60,7 +60,11 @@ public class SwerveModule {
         this.azimuthMotor.configSelectedFeedbackCoefficient(360.0 / (2048 * 56.0 / 3.0), 0, Constants.kCanTimeoutMs);
 
         this.driveMotor.setNeutralMode(Constants.DRIVE_BREAK_MODE);
-        this.azimuthMotor.setNeutralMode(NeutralMode.Brake);
+        if(Constants.ZEROING) {
+            this.azimuthMotor.setNeutralMode(NeutralMode.Coast);
+        } else {
+            this.azimuthMotor.setNeutralMode(NeutralMode.Brake);
+        }
         this.driveMotor.setInverted(false);
         this.azimuthMotor.setInverted(false);
 
@@ -178,8 +182,6 @@ public class SwerveModule {
     }
 
     public void setDriveVelocityWithFF(double velocity, double ff) {
-        if (this.name.equals("FR"))
-            return;
         this.driveController.setSetpointWithFF(velocity, ff);
     }
 
@@ -192,7 +194,9 @@ public class SwerveModule {
             error = this.azimuthMotor.setSelectedSensorPosition(this.azimuthEncoder.getRotationDegrees(), 0,
                     Constants.kCanTimeoutMs);
         }
-        // this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
+        if(!Constants.ZEROING) {
+            this.azimuthController.setSetpoint(this.azimuthEncoder.getRotationDegrees());
+        }
     }
 
     public void zeroDriveEncoder() {

@@ -101,18 +101,20 @@ public class SwerveDrive {
         this.drive(x, y, r, true);
     }
 
-    public void velocityDriveWithFF(double xVelocity, double yVelocity, double omega, double feedForwardVoltage,
+    public void velocityDriveWithFF(double xVelocity, double yVelocity, double r, double feedForwardVoltage,
             boolean fieldOriented) {
         Vector2D velocityVector = Vector2D.vectorFromRectForm(xVelocity, yVelocity);
         if (fieldOriented) {
             double yaw = navX.getYaw();
             velocityVector = velocityVector.rotate(yaw, true);
         }
+        //Vector2D scaledVelocityVector = velocityVector.scale(1-Math.abs(rotationPercent));
+       // double rotationSpeed = velocityVector.getLength()*rotationPercent;
         // needs to be adjusted for omega
-        Vector2D fLVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(omega, frontLeftModule));
-        Vector2D fRVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(omega, frontRightModule));
-        Vector2D bLVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(omega, backLeftModule));
-        Vector2D bRVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(omega, backRightModule));
+        Vector2D fLVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(velocityVector.getLength()*r, frontLeftModule));
+        Vector2D fRVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(velocityVector.getLength()*r, frontRightModule));
+        Vector2D bLVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(velocityVector.getLength()*r, backLeftModule));
+        Vector2D bRVector = Vector2D.addVectors(velocityVector, getTurnAngleVector(velocityVector.getLength()*r, backRightModule));
         double ff = feedForwardVoltage / Robot.getPDPVoltage();
         frontLeftModule.setVelocityVectorWithFF(fLVector, ff);
         frontRightModule.setVelocityVectorWithFF(fRVector, ff);
@@ -120,8 +122,8 @@ public class SwerveDrive {
         backRightModule.setVelocityVectorWithFF(bRVector, ff);
     }
 
-    public void velocityDriveWithFF(double xVelocity, double yVelocity, double omega, double feedForwardVoltage) {
-        velocityDriveWithFF(xVelocity, yVelocity, omega, feedForwardVoltage, true);
+    public void velocityDriveWithFF(double xVelocity, double yVelocity, double rotationPercent, double feedForwardVoltage) {
+        velocityDriveWithFF(xVelocity, yVelocity, rotationPercent, feedForwardVoltage, true);
     }
 
     public void toggleRightTurning() {

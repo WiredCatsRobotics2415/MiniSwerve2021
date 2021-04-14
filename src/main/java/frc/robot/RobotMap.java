@@ -27,10 +27,10 @@ public class RobotMap {
     public static final boolean BACK_LEFT_AZIMUTH_ENCODER_REV = true;
     public static final boolean BACK_RIGHT_AZIMUTH_ENCODER_REV = true;
 
-    public static final double FRONT_LEFT_MODULE_X = -1, FRONT_LEFT_MODULE_Y = 1; // inches
-    public static final double FRONT_RIGHT_MODULE_X = 1, FRONT_RIGHT_MODULE_Y = 1; // quick values for sqare robot
-    public static final double BACK_LEFT_MODULE_X = -1, BACK_LEFT_MODULE_Y = -1;
-    public static final double BACK_RIGHT_MODULE_X = 1, BACK_RIGHT_MODULE_Y = -1;
+    public static final double FRONT_LEFT_MODULE_X = -18.79/2.0, FRONT_LEFT_MODULE_Y = 18.79/2.0; // inches
+    public static final double FRONT_RIGHT_MODULE_X = 18.79/2.0, FRONT_RIGHT_MODULE_Y = 18.79/2.0; // quick values for sqare robot
+    public static final double BACK_LEFT_MODULE_X = -18.79/2.0, BACK_LEFT_MODULE_Y = -18.79/2.0;
+    public static final double BACK_RIGHT_MODULE_X = 18.79/2.0, BACK_RIGHT_MODULE_Y = -18.79/2.0;
 
     public static final double CENTER_OF_MASS_X = 0;
     public static final double CENTER_OF_MASS_Y = 0;

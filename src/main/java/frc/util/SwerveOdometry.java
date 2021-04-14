@@ -27,7 +27,7 @@ public class SwerveOdometry implements Runnable {
         this.bl = swerveDrive.getModule(2);
         this.br = swerveDrive.getModule(3);
         this.swerveDrive = swerveDrive;
-        this.thetaOffset = -swerveDrive.getYaw() + this.theta;
+        this.thetaOffset = swerveDrive.getYaw() + this.theta;
         this.frLastValue = fr.getDrivePosition();
         this.flLastValue = fl.getDrivePosition();
         this.blLastValue = bl.getDrivePosition();
@@ -42,7 +42,7 @@ public class SwerveOdometry implements Runnable {
     }
 
     public void iterate() {
-        this.theta = swerveDrive.getYaw() + this.thetaOffset;
+        this.theta = Vector2D.modulus(-swerveDrive.getYaw() + this.thetaOffset,360.0);
         double frValue = fr.getDrivePosition();
         double flValue = fl.getDrivePosition();
         double blValue = bl.getDrivePosition();
@@ -52,7 +52,7 @@ public class SwerveOdometry implements Runnable {
         Vector2D blChange = new Vector2D(blValue - this.blLastValue, this.bl.getAzimuthAngle(), true);
         Vector2D brChange = new Vector2D(brValue - this.brLastValue, this.br.getAzimuthAngle(), true);
         Vector2D translationVector = Vector2D.addVectors(frChange, flChange, blChange, brChange)
-                .scale(0.25 * SwerveModule.UNITS_TO_FT_DRIVE).rotate(-this.theta, true);
+                .scale(0.25 * SwerveModule.UNITS_TO_FT_DRIVE).rotate(this.theta, true);
         double thetaChange = (frChange.dot(getTurningUnitVector(fr)) + flChange.dot(getTurningUnitVector(fl))
                 + blChange.dot(getTurningUnitVector(bl)) + brChange.dot(getTurningUnitVector(br))) / 4.0;
         // might use thetaChange later

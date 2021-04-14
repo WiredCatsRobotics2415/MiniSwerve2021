@@ -34,6 +34,8 @@ public class Robot extends TimedRobot {
   public static PathFollowerController pathController;
   public static SwerveOdometry odometry;
 
+  public static String saveName = "odom.csv";
+
   public static OI oi;
 
   private long time = 0;
@@ -92,10 +94,19 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    boolean balls = true;
+    saveName = "bounce.csv";
     CSVReader csvReader = new CSVReader(Filesystem.getDeployDirectory() + "/traject.csv");
     pathController = new PathFollowerController(swerveDrive, csvReader.getValues(), Constants.KS, Constants.KV,
-        Constants.KA, 1, Constants.DRIVE_DISTANCE_PID, true);
+        Constants.KA, 1, Constants.DRIVE_DISTANCE_PID, Constants.TURNING_PID, true);
     pathController.start();
+    if(balls) {
+      intake.extend();
+      intake.intake();
+    } else {
+      intake.retract();
+      intake.stopIntaking();
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -108,49 +119,53 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     swerveDrive.zeroYaw();
+    intake.retract();
+    intake.stopIntaking();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    odometry.iterate();
-    // System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
-    if (oi.getRightTurningToggle()) {
-      swerveDrive.toggleRightTurning();
-    } else if (oi.getLeftTurningToggle()) {
-      swerveDrive.toggleLeftTurning();
-    }
-    swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
-    if (oi.getIntakeExtensionToggle()) {
-      System.out.println("extention toggle");
-      intake.toggleExtension();
-    }
-    if (oi.getIntakeToggle()) {
-      intake.toggleIntaking();
-    }
-    if (oi.getCompressorToggle()) {
-      System.out.println("Compressor toggle");
-      if (compressor.enabled()) {
-        compressor.stop();
-      } else {
-        compressor.start();
+    //odometry.iterate();
+    //System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
+    if(!Constants.ZEROING) {
+      if (oi.getRightTurningToggle()) {
+        swerveDrive.toggleRightTurning();
+      } else if (oi.getLeftTurningToggle()) {
+        swerveDrive.toggleLeftTurning();
       }
-    }
-    if (oi.getRawButtonPressed(14)) {
-      System.out.println("zero Encoders");
-      swerveDrive.zeroEncoders();
+      swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
+      if (oi.getIntakeExtensionToggle()) {
+        System.out.println("extension toggle");
+        intake.toggleExtension();
+      }
+      if (oi.getIntakeToggle()) {
+        intake.toggleIntaking();
+      }
+      if (oi.getCompressorToggle()) {
+        System.out.println("Compressor toggle");
+        if (compressor.enabled()) {
+          compressor.stop();
+        } else {
+          compressor.start();
+        }
+      }
+      if (oi.getRawButtonPressed(14)) {
+        System.out.println("zero Encoders");
+        swerveDrive.zeroEncoders();
+      }
     }
     /*
      * if(oi.getRawButtonPressed(1)) { System.out.println("logged");
      * swerveDrive.saveLog(); navXLogger.saveDataToCSV("accel.csv"); }
      */
     // swerveDrive.printCurrents();
-    /*
-     * if(oi.getRawButtonPressed(1)) { swerveDrive.printModuleEncoders((short)0); }
-     * if(oi.getRawButtonPressed(2)) { swerveDrive.printModuleEncoders((short)1); }
-     * if(oi.getRawButtonPressed(3)) { swerveDrive.printModuleEncoders((short)2); }
-     * if(oi.getRawButtonPressed(4)) { swerveDrive.printModuleEncoders((short)3); }
-     */
+    else {
+      if(oi.getRawButtonPressed(1)) { swerveDrive.printModuleEncoders((short)0); }
+      if(oi.getRawButtonPressed(2)) { swerveDrive.printModuleEncoders((short)1); }
+      if(oi.getRawButtonPressed(3)) { swerveDrive.printModuleEncoders((short)2); }
+      if(oi.getRawButtonPressed(4)) { swerveDrive.printModuleEncoders((short)3); }
+    }
   }
 
   /** This function is called once when the robot is disabled. */
@@ -166,17 +181,19 @@ public class Robot extends TimedRobot {
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
-    swerveDrive.zeroYaw();
+    pathController.saveLog();
+    /*swerveDrive.zeroYaw();
     swerveDrive.zeroDriveEncoders();
     this.time = System.currentTimeMillis();
     this.speed += 0.1;
-    this.driving = true;
+    this.driving = true;*/
   }
 
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    this.navXLogger.run();
+    swerveDrive.drive(0, 0, 0);
+    /*this.navXLogger.run();
     long timePassed = System.currentTimeMillis() - this.time;
     if (timePassed < 500) {
       swerveDrive.drive(0, 0, 0);
@@ -189,7 +206,7 @@ public class Robot extends TimedRobot {
       swerveDrive.drive(0, 0, 0);
     }
     // System.out.println(swerveDrive.avgEncoderValue());
-    swerveDrive.log();
+    swerveDrive.log();*/
   }
 
   public static double getPDPVoltage() {

@@ -56,7 +56,7 @@ public class Intake {
     }
 
     public void intake() {
-        this.intakeMotor.set(.8);
+        this.intakeMotor.set(.5);
         this.intaking = true;
     }
 

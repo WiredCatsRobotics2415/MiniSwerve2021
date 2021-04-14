@@ -10,8 +10,8 @@ public class CSVReader {
 
     public CSVReader(String filename) {
         this.data = new ArrayList<double[]>();
+        String line = "";
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 double[] doubleValues = new double[values.length];
@@ -21,6 +21,7 @@ public class CSVReader {
                     }
                     this.data.add(doubleValues);
                 } catch (NumberFormatException e) {
+                    System.out.println(line);
                     System.err.println(filename + " includes a non-number");
                 }
             }

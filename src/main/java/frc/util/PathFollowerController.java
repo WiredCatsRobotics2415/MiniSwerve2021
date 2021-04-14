@@ -1,6 +1,7 @@
 package frc.util;
 
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.subsystems.SwerveDrive;
 import frc.util.logging.MotorLogger;
 import frc.util.logging.OdometryLogger;
@@ -11,6 +12,7 @@ public class PathFollowerController implements Runnable {
     private final double kS, kV, kA;
     private final TunablePIDController xController;
     private final TunablePIDController yController;
+    private final TunablePIDController thetaController;
 
     private MotorLogger logger;
     private double lookAheadTime;
@@ -23,7 +25,7 @@ public class PathFollowerController implements Runnable {
 
     // trajectory should be in feet and degrees
     public PathFollowerController(SwerveDrive swerveDrive, MotionState[] trajectory, double kS, double kV, double kA,
-            double lookAheadTime, PIDValue distancePID, boolean logging) {
+            double lookAheadTime, PIDValue distancePID, PIDValue turningPID, boolean logging) {
         this.trajectory = trajectory.clone();
         this.swerveDrive = swerveDrive;
         if (this.trajectory.length == 0) {
@@ -36,6 +38,7 @@ public class PathFollowerController implements Runnable {
         this.xController.setSetpoint(0);
         this.yController = new TunablePIDController(distancePID);
         this.yController.setSetpoint(0);
+        this.thetaController = new TunablePIDController(turningPID);
         this.kS = kS;
         this.kV = kV;
         this.kA = kA;
@@ -51,13 +54,13 @@ public class PathFollowerController implements Runnable {
     }
 
     public PathFollowerController(SwerveDrive swerveDrive, double[][] trajectory, double kS, double kV, double kA,
-            double lookAheadTime, PIDValue distancePID) {
-        this(swerveDrive, convertFromArray(trajectory), kS, kV, kA, lookAheadTime, distancePID, false);
+            double lookAheadTime, PIDValue distancePID, PIDValue turningPID) {
+        this(swerveDrive, convertFromArray(trajectory), kS, kV, kA, lookAheadTime, distancePID, turningPID, false);
     }
 
     public PathFollowerController(SwerveDrive swerveDrive, double[][] trajectory, double kS, double kV, double kA,
-            double lookAheadTime, PIDValue distancePID, boolean logging) {
-        this(swerveDrive, convertFromArray(trajectory), kS, kV, kA, lookAheadTime, distancePID, logging);
+            double lookAheadTime, PIDValue distancePID, PIDValue turningPID, boolean logging) {
+        this(swerveDrive, convertFromArray(trajectory), kS, kV, kA, lookAheadTime, distancePID, turningPID, logging);
     }
 
     public void start() {
@@ -84,18 +87,36 @@ public class PathFollowerController implements Runnable {
         Vector2D velocity = new Vector2D(currentState.velocity, direction, true);
         double xError = odometry.getX() - currentState.x;
         double yError = odometry.getY() - currentState.y;
+        double thetaError = odometry.getTheta() - currentState.theta;
         xError = this.xController.calculate(xError);
-        yError = this.xController.calculate(yError);
+        yError = this.yController.calculate(yError);
+        thetaError = this.thetaController.calculate(thetaError);
         direction = velocity.getAngleDeg();
         double feedForwardVoltage = this.kS * Math.signum(velocity.getLength()) + this.kV * velocity.getLength()
                 + this.kA * currentState.accel;
         Vector2D feedForwardVector = new Vector2D(feedForwardVoltage, direction, true);
         Vector2D xErrorVector = new Vector2D(xError, 0, true);
         Vector2D yErrorVector = new Vector2D(yError, 90, true);
+        //System.out.println("1" + feedForwardVector.getLength());
         feedForwardVector = Vector2D.addVectors(feedForwardVector, xErrorVector, yErrorVector);
+        //System.out.println("2" + feedForwardVector.getLength());
+        //double rotatePercent = currentState.rotationPercent;
+        double theta = swerveDrive.getYaw();
+        /*if(Math.signum(thetaError) == Math.signum(rotatePercent)) {
+            feedForwardVector = feedForwardVector.scale(1+Math.abs(thetaError));
+            rotatePercent += thetaError;
+        } else {
+            feedForwardVector = feedForwardVector.scale(1-Math.abs(thetaError));
+            rotatePercent += thetaError;
+        }*/
         velocity = new Vector2D(velocity.getLength(), feedForwardVector.getAngleDeg(), true);
-        this.swerveDrive.velocityDriveWithFF(velocity.getX(), velocity.getY(), currentState.omega,
-                feedForwardVector.getLength());
+        //System.out.println("3" + feedForwardVector.getLength());
+        //velocity = feedForwardVector.scale(1-rotatePercent);
+        //System.out.println("4" + feedForwardVector.getLength());
+        //this.swerveDrive.velocityDriveWithFF(velocity.getX(), velocity.getY(), theta*-0.05,//-currentState.rotationPercent,
+        //        feedForwardVector.getLength()); //rotation is opposite for swerve drive
+        feedForwardVector = feedForwardVector.scale(1.0 / Robot.getPDPVoltage());
+        this.swerveDrive.drive(feedForwardVector.getX(), feedForwardVector.getY(), theta*-0.005);
     }
 
     private int getClosestStateIndex(long time) { // in millis
@@ -117,9 +138,10 @@ public class PathFollowerController implements Runnable {
 
     public void saveLog() {
         if (this.logger != null) {
-            System.out.println("odom logged");
-            this.logger.saveDataToCSV("odom" + Constants.KA + "A" + Constants.KS + "S" + Constants.KV + "V"
-                    + Constants.DRIVE_DISTANCE_PID.getKP() + "P" + ".csv");
+            //System.out.println("odom logged");
+            this.logger.saveDataToCSV(Robot.saveName);
+            //this.logger.saveDataToCSV("odom" + Constants.KA + "A" + Constants.KS + "S" + Constants.KV + "V"
+            //        + Constants.DRIVE_DISTANCE_PID.getKP() + "P" + ".csv");
         }
     }
 
@@ -134,7 +156,7 @@ public class PathFollowerController implements Runnable {
             try {
                 trajectory[i] = new MotionState(array[i][timeIndex], array[i][xIndex], array[i][yIndex],
                         array[i][thetaIndex], array[i][velocityIndex], array[i][directionIndex], array[i][omegaIndex],
-                        array[i][accelIndex], array[i][alphaIndex]);
+                        array[i][accelIndex]);
             } catch (ArrayIndexOutOfBoundsException e) {
                 System.err.println("array trajectory does not meet specified array config");
             }

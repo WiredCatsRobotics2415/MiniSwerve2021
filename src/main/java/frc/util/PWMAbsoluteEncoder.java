@@ -13,6 +13,7 @@ public class PWMAbsoluteEncoder {
     private final Counter encoderRawInputUp;
     private final Counter encoderRawInputDown;
     private boolean reversed;
+    private boolean testing;
 
     public PWMAbsoluteEncoder(int channel) {
         this.encoderInput = new DigitalInput(channel);
@@ -27,12 +28,37 @@ public class PWMAbsoluteEncoder {
 
         this.offset = 0;
         this.reversed = false;
+        this.testing = false;
     }
 
     public PWMAbsoluteEncoder(int channel, double degreesOffset, boolean reversed) {
         this(channel);
         setOffset(degreesOffset);
         this.reversed = reversed;
+    }
+
+    public PWMAbsoluteEncoder(boolean testing, int channel) {
+        if(!testing) {
+            this.encoderInput = new DigitalInput(channel);
+
+            this.encoderRawInputUp = new Counter(Mode.kSemiperiod); // right mode for this application
+            this.encoderRawInputUp.setUpSource(this.encoderInput);// select the port
+            this.encoderRawInputUp.setSemiPeriodMode(true); // measure from rising edge to falling edge
+
+            this.encoderRawInputDown = new Counter(Mode.kSemiperiod); // right mode for this application
+            this.encoderRawInputDown.setUpSource(this.encoderInput);// select the port
+            this.encoderRawInputDown.setSemiPeriodMode(false); // measure from rising edge to falling edge
+
+            this.offset = 0;
+            this.reversed = false;
+        } else {
+            this.encoderInput = null;
+            this.encoderRawInputDown = null;
+            this.encoderRawInputUp = null;
+            this.offset = 0;
+            this.reversed = false;
+            this.testing = true;
+        }
     }
 
     public void setOffset(double degreeOffset) {
@@ -42,8 +68,14 @@ public class PWMAbsoluteEncoder {
     }
 
     public double getRotationRaw() { // out of 1024 for 10 bit PWM
-        double timeOn = encoderRawInputUp.getPeriod() * 1000000; // get time in seconds and convert to microseconds
-        double timeOff = encoderRawInputDown.getPeriod() * 1000000;
+        double timeOn, timeOff;
+        if(!testing) {
+            timeOn = encoderRawInputUp.getPeriod() * 1000000; // get time in seconds and convert to microseconds
+            timeOff = encoderRawInputDown.getPeriod() * 1000000;
+        } else {
+            timeOn = 0;
+            timeOff = 1024;
+        }
         double x = ((timeOn * 1026) / (timeOn + timeOff)) - 1;
         double returnValue = 0;
         if (x <= 1023)

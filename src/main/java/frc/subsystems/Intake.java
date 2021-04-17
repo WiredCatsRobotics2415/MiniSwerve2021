@@ -68,9 +68,20 @@ public class Intake {
     public void toggleIntaking() {
         if (intaking) {
             this.stopIntaking();
+        } else if (extended) {
+            this.intake();
         } else {
+            this.extend();
             this.intake();
         }
+    }
+
+    public boolean getExtended() {
+        return this.extended;
+    }
+
+    public boolean getIntaking() {
+        return this.intaking;
     }
 
     public void printCurrent() {

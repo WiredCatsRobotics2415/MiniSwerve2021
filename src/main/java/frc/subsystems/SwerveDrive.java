@@ -36,22 +36,22 @@ public class SwerveDrive {
                 RobotMap.FRONT_LEFT_SWERVE_AZIMUTH_REV, RobotMap.FRONT_LEFT_AZIMUTH_ENCODER,
                 RobotMap.FRONT_LEFT_MODULE_X, RobotMap.FRONT_LEFT_MODULE_Y, Constants.FRONT_LEFT_AZIMUTH_PID,
                 Constants.FRONT_LEFT_AZIMUTH_ENCODER_OFFSET, RobotMap.FRONT_LEFT_AZIMUTH_ENCODER_REV,
-                Constants.FRONT_LEFT_VEL_DRIVE_PIDF, tuning, logging, Constants.FRONT_LEFT_MODULE_NAME);
+                Constants.FRONT_LEFT_VEL_DRIVE_PIDF, tuning, logging, Constants.SwerveModuleName.FRONT_LEFT);
         this.frontRightModule = new SwerveModule(RobotMap.FRONT_RIGHT_SWERVE_DRIVE, RobotMap.FRONT_RIGHT_SWERVE_AZIMUTH,
                 RobotMap.FRONT_RIGHT_SWERVE_AZIMUTH_REV, RobotMap.FRONT_RIGHT_AZIMUTH_ENCODER,
                 RobotMap.FRONT_RIGHT_MODULE_X, RobotMap.FRONT_RIGHT_MODULE_Y, Constants.FRONT_RIGHT_AZIMUTH_PID,
                 Constants.FRONT_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.FRONT_RIGHT_AZIMUTH_ENCODER_REV,
-                Constants.FRONT_RIGHT_VEL_DRIVE_PIDF, tuning, logging, Constants.FRONT_RIGHT_MODULE_NAME);
+                Constants.FRONT_RIGHT_VEL_DRIVE_PIDF, tuning, logging, Constants.SwerveModuleName.FRONT_RIGHT);
         this.backLeftModule = new SwerveModule(RobotMap.BACK_LEFT_SWERVE_DRIVE, RobotMap.BACK_LEFT_SWERVE_AZIMUTH,
                 RobotMap.BACK_LEFT_SWERVE_AZIMUTH_REV, RobotMap.BACK_LEFT_AZIMUTH_ENCODER, RobotMap.BACK_LEFT_MODULE_X,
                 RobotMap.BACK_LEFT_MODULE_Y, Constants.BACK_LEFT_AZIMUTH_PID,
                 Constants.BACK_LEFT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_LEFT_AZIMUTH_ENCODER_REV,
-                Constants.BACK_LEFT_VEL_DRIVE_PIDF, tuning, logging, Constants.BACK_LEFT_MODULE_NAME);
+                Constants.BACK_LEFT_VEL_DRIVE_PIDF, tuning, logging, Constants.SwerveModuleName.BACK_LEFT);
         this.backRightModule = new SwerveModule(RobotMap.BACK_RIGHT_SWERVE_DRIVE, RobotMap.BACK_RIGHT_SWERVE_AZIMUTH,
                 RobotMap.BACK_RIGHT_SWERVE_AZIMUTH_REV, RobotMap.BACK_RIGHT_AZIMUTH_ENCODER,
                 RobotMap.BACK_RIGHT_MODULE_X, RobotMap.BACK_RIGHT_MODULE_Y, Constants.BACK_RIGHT_AZIMUTH_PID,
                 Constants.BACK_RIGHT_AZIMUTH_ENCODER_OFFSET, RobotMap.BACK_RIGHT_AZIMUTH_ENCODER_REV,
-                Constants.BACK_RIGHT_VEL_DRIVE_PIDF, tuning, logging, Constants.BACK_RIGHT_MODULE_NAME);
+                Constants.BACK_RIGHT_VEL_DRIVE_PIDF, tuning, logging, Constants.SwerveModuleName.BACK_RIGHT);
 
         this.navX = new AHRS(Port.kMXP);
         this.maxModuleRadius = Math.max(Math.max(this.frontLeftModule.getRadius(), this.frontRightModule.getRadius()),
@@ -126,19 +126,23 @@ public class SwerveDrive {
         velocityDriveWithFF(xVelocity, yVelocity, rotationPercent, feedForwardVoltage, true);
     }
 
-    public void toggleRightTurning() {
+    public boolean toggleRightTurning() {
         if (this.specialMode != SwerveSpecialMode.RIGHT_TURNING) {
             this.specialMode = SwerveSpecialMode.RIGHT_TURNING;
+            return true;
         } else {
             this.specialMode = SwerveSpecialMode.NORMAL;
+            return false;
         }
     }
 
-    public void toggleLeftTurning() {
+    public boolean toggleLeftTurning() {
         if (this.specialMode != SwerveSpecialMode.LEFT_TURNING) {
             this.specialMode = SwerveSpecialMode.LEFT_TURNING;
+            return true;
         } else {
             this.specialMode = SwerveSpecialMode.NORMAL;
+            return false;
         }
     }
 
@@ -149,8 +153,8 @@ public class SwerveDrive {
         backRightModule.printAzimuthEncoderValue();
     }
 
-    public void printModuleEncoders(short moduleNum) {
-        SwerveModule module = this.getModule(moduleNum);
+    public void printModuleEncoders(Constants.SwerveModuleName name) {
+        SwerveModule module = this.getModule(name);
         module.printAzimuthEncoderValue();
         module.printAzimuthTalonEncoderValue();
     }
@@ -177,23 +181,23 @@ public class SwerveDrive {
         return new Vector2D(r * module.getRadius() / maxModuleRadius, angle);
     }
 
-    public SwerveModule getModule(int moduleNum) {
+    public SwerveModule getModule(Constants.SwerveModuleName name) {
         SwerveModule module;
-        switch (moduleNum) {
-            case 0:
-                module = this.frontRightModule;
-                break;
-            case 1:
+        switch (name) {
+            case FRONT_LEFT:
                 module = this.frontLeftModule;
                 break;
-            case 2:
+            case FRONT_RIGHT:
+                module = this.frontRightModule;
+                break;
+            case BACK_LEFT:
                 module = this.backLeftModule;
                 break;
-            case 3:
+            case BACK_RIGHT:
                 module = this.backRightModule;
                 break;
             default:
-                module = this.frontRightModule;
+                module = this.frontLeftModule;
                 break;
         }
         return module;

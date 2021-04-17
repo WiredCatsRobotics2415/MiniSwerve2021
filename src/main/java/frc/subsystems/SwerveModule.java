@@ -37,7 +37,7 @@ public class SwerveModule {
     private double prevAzimuthSetpoint;
     private int turns;
     private boolean azimuthReversed;
-    private String name;
+    private Constants.SwerveModuleName name;
     private boolean testing;
 
     public SwerveModule(int driveMotorID, int azimuthMotorID, boolean azimuthRev, int azimuthEncoderChannel,
@@ -111,17 +111,17 @@ public class SwerveModule {
         this.turns = 0;
 
         this.logger = null;
-        this.name = "";
+        this.name = null;
         this.testing = false;
     }
 
     public SwerveModule(int driveMotorID, int azimuthMotorID, boolean azimuthRev, int azimuthEncoderChannel,
             double positionX, double positionY, PIDValue pidValues, double azimuthEncoderOffset,
-            boolean azimuthEncoderReversed, PIDFValue drivePIDF, boolean azimuthTuning, boolean logging, String name) {
+            boolean azimuthEncoderReversed, PIDFValue drivePIDF, boolean azimuthTuning, boolean logging, Constants.SwerveModuleName name) {
         this(driveMotorID, azimuthMotorID, azimuthRev, azimuthEncoderChannel, positionX, positionY, pidValues,
                 azimuthEncoderOffset, azimuthEncoderReversed, drivePIDF);
         if (azimuthTuning) {
-            this.azimuthController.enableTuning(name);
+            this.azimuthController.enableTuning(name.toString());
         }
         if (logging) {
             this.logger = new MotorLogger(new SwerveModuleLogger(this, Constants.SWERVE_LOGGING_MODE));
@@ -340,13 +340,13 @@ public class SwerveModule {
     }
 
     public void printAzimuthTalonEncoderValue() {
-        System.out.println("TalonFx x:" + this.getPositionX() + " y:" + this.getPositionY() + " Value:"
+        System.out.println("TalonFx " + this.name.toString() + " Value:"
                 + this.azimuthMotor.getSelectedSensorPosition(0) + " : "
                 + this.azimuthMotor.getSelectedSensorPosition(0) % 360);
     }
 
     public void printAzimuthEncoderValue() {
-        System.out.println("MA3 x:" + this.getPositionX() + " y:" + this.getPositionY() + " Value:"
+        System.out.println("MA3 " + this.name.toString() + " Value:"
                 + this.azimuthEncoder.getRotationDegrees());
     }
     

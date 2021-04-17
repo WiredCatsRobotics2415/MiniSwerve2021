@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
     pathController = new PathFollowerController(swerveDrive, csvReader.getValues(), Constants.KS, Constants.KV,
         Constants.KA, 1, Constants.DRIVE_DISTANCE_PID, Constants.TURNING_PID, true);
     pathController.start();
-    if(balls) {
+    if (balls) {
       intake.extend();
       intake.intake();
     } else {
@@ -126,28 +126,30 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //odometry.iterate();
-    //System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
-    if(!Constants.ZEROING) {
+    // odometry.iterate();
+    // System.out.println("x:"+odometry.getX()+" y:"+odometry.getY());
+    if (!Constants.ZEROING) {
       if (oi.getRightTurningToggle()) {
-        swerveDrive.toggleRightTurning();
+        System.out.println("Right turning: " + swerveDrive.toggleRightTurning());
       } else if (oi.getLeftTurningToggle()) {
-        swerveDrive.toggleLeftTurning();
+        System.out.println("Left turning: " + swerveDrive.toggleLeftTurning());
       }
       swerveDrive.drive(oi.getX(), oi.getY(), oi.getRotation());
       if (oi.getIntakeExtensionToggle()) {
-        System.out.println("extension toggle");
         intake.toggleExtension();
+        System.out.println("Intake extended: " + intake.getExtended());
       }
       if (oi.getIntakeToggle()) {
         intake.toggleIntaking();
+        System.out.println("Intake motors: " + intake.getIntaking());
       }
       if (oi.getCompressorToggle()) {
-        System.out.println("Compressor toggle");
         if (compressor.enabled()) {
           compressor.stop();
+          System.out.println("Compressor stop");
         } else {
           compressor.start();
+          System.out.println("Compressor start");
         }
       }
       if (oi.getRawButtonPressed(14)) {
@@ -161,10 +163,18 @@ public class Robot extends TimedRobot {
      */
     // swerveDrive.printCurrents();
     else {
-      if(oi.getRawButtonPressed(1)) { swerveDrive.printModuleEncoders((short)0); }
-      if(oi.getRawButtonPressed(2)) { swerveDrive.printModuleEncoders((short)1); }
-      if(oi.getRawButtonPressed(3)) { swerveDrive.printModuleEncoders((short)2); }
-      if(oi.getRawButtonPressed(4)) { swerveDrive.printModuleEncoders((short)3); }
+      if (oi.getRawButtonPressed(1)) {
+        swerveDrive.printModuleEncoders(Constants.SwerveModuleName.FRONT_LEFT);
+      }
+      if (oi.getRawButtonPressed(2)) {
+        swerveDrive.printModuleEncoders(Constants.SwerveModuleName.FRONT_RIGHT);
+      }
+      if (oi.getRawButtonPressed(3)) {
+        swerveDrive.printModuleEncoders(Constants.SwerveModuleName.BACK_LEFT);
+      }
+      if (oi.getRawButtonPressed(4)) {
+        swerveDrive.printModuleEncoders(Constants.SwerveModuleName.BACK_RIGHT);
+      }
     }
   }
 
@@ -182,31 +192,24 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     pathController.saveLog();
-    /*swerveDrive.zeroYaw();
-    swerveDrive.zeroDriveEncoders();
-    this.time = System.currentTimeMillis();
-    this.speed += 0.1;
-    this.driving = true;*/
+    /*
+     * swerveDrive.zeroYaw(); swerveDrive.zeroDriveEncoders(); this.time =
+     * System.currentTimeMillis(); this.speed += 0.1; this.driving = true;
+     */
   }
 
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
     swerveDrive.drive(0, 0, 0);
-    /*this.navXLogger.run();
-    long timePassed = System.currentTimeMillis() - this.time;
-    if (timePassed < 500) {
-      swerveDrive.drive(0, 0, 0);
-    } else if (oi.getRawButtonPressed(2)) {
-      this.driving = false;
-    } else if (this.driving) {
-      // swerveDrive.drive(0, 0.3, 0);
-      swerveDrive.drive(0, this.speed, 0);
-    } else {
-      swerveDrive.drive(0, 0, 0);
-    }
-    // System.out.println(swerveDrive.avgEncoderValue());
-    swerveDrive.log();*/
+    /*
+     * this.navXLogger.run(); long timePassed = System.currentTimeMillis() -
+     * this.time; if (timePassed < 500) { swerveDrive.drive(0, 0, 0); } else if
+     * (oi.getRawButtonPressed(2)) { this.driving = false; } else if (this.driving)
+     * { // swerveDrive.drive(0, 0.3, 0); swerveDrive.drive(0, this.speed, 0); }
+     * else { swerveDrive.drive(0, 0, 0); } //
+     * System.out.println(swerveDrive.avgEncoderValue()); swerveDrive.log();
+     */
   }
 
   public static double getPDPVoltage() {

@@ -1,5 +1,6 @@
 package frc.util;
 
+import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.subsystems.SwerveDrive;
 import frc.subsystems.SwerveModule;
@@ -22,10 +23,10 @@ public class SwerveOdometry implements Runnable {
     public SwerveOdometry(double x, double y, double theta, SwerveDrive swerveDrive) {
         this.position = Vector2D.vectorFromRectForm(x, y);
         this.theta = theta;
-        this.fr = swerveDrive.getModule(0);
-        this.fl = swerveDrive.getModule(1);
-        this.bl = swerveDrive.getModule(2);
-        this.br = swerveDrive.getModule(3);
+        this.fl = swerveDrive.getModule(Constants.SwerveModuleName.FRONT_LEFT);
+        this.fr = swerveDrive.getModule(Constants.SwerveModuleName.FRONT_RIGHT);
+        this.bl = swerveDrive.getModule(Constants.SwerveModuleName.BACK_LEFT);
+        this.br = swerveDrive.getModule(Constants.SwerveModuleName.BACK_RIGHT);
         this.swerveDrive = swerveDrive;
         this.thetaOffset = swerveDrive.getYaw() + this.theta;
         this.frLastValue = fr.getDrivePosition();
